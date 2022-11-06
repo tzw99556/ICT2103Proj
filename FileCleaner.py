@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import json 
 import csv
+from datetime import datetime 
 
 class FileCleaner:
     """Used to obtain a .csv file that contains only countries and columns of interest"""
@@ -30,15 +31,18 @@ class JsonManager:
     "Used to generate json file for mongoDB"
     def __init__(self, source_file_name):
         self.source_file_name = source_file_name
+        self.dest_file_name = f"[JSON]-{os.path.splitext(self.source_file_name)[0]}.csv"
+    
+    def change_file(self, source_file_name):
+        self.source_file_name = source_file_name
         self.dest_file_name = f"[JSON]-{os.path.splitext(source_file_name)[0]}.csv"
-        
+
     def csv_to_json(self):
         jsonArray = []   
         #read csv file
         with open(self.source_file_name, encoding='utf-8') as csv_f: 
             #load csv file data using csv library's dictionary reader
             csvReader = csv.DictReader(csv_f) 
-
             #convert each csv row into python dict
             for row in csvReader: 
                 #add this python dict to json array
@@ -50,11 +54,20 @@ class JsonManager:
             json_f.write(jsonString)
         
 def main():
+    # Cleans - worldindata-covid-allcountries.csv 
+    worldindata_cleaner = FileCleaner("worldindata-covid.csv")
     countries_to_keep = ["Brunei", "Myanmar", "Cambodia", "Timor", "Indonesia", "Malaysia", "Philippines", "Singapore", "Thailand", "Vietnam", "Laos"]
-    columns_to_keep= ["iso_code", "location", "date", "total_cases", "new_cases", "total_deaths", "new_deaths", "total_cases_per_million", "new_cases_per_million", "total_deaths_per_million", "new_deaths_per_million", "icu_patients", "icu_patients_per_million", "hosp_patients", "hosp_patients_per_million", "weekly_icu_admissions", "weekly_icu_admissions_per_million", "weekly_hosp_admissions", "weekly_hosp_admissions_per_million", "total_tests", "new_tests", "total_tests_per_thousand", "new_tests_per_thousand", "positive_rate", "total_vaccinations", "people_vaccinated", "people_fully_vaccinated", "total_boosters" , "new_vaccinations", "total_vaccinations_per_hundred", "people_vaccinated_per_hundred", "people_fully_vaccinated_per_hundred", "total_boosters_per_hundred", "stringency_index", "population", "population_density"]
-    worldindata = FileCleaner("worldindata-covid-allcountries.csv")
-    worldindata.clean_raw_data(countries_to_keep, columns_to_keep)
-    json_manager = JsonManager(worldindata.dest_file_name)
+    columns_to_keep= ["iso_code", "location", "date", "total_cases", "new_cases", "total_deaths", "new_deaths", "hosp_patients", "weekly_hosp_admissions", "stringency_index", "population", "population_density"]
+    worldindata_cleaner.clean_raw_data(countries_to_keep, columns_to_keep)
+    json_manager = JsonManager(worldindata_cleaner.dest_file_name)
+    json_manager.csv_to_json()
+
+    # Cleans - vaccination-data.csv
+    vaccinationdata_cleaner = FileCleaner("vaccination-data.csv")
+    countries_to_keep = ["Brunei", "Myanmar", "Cambodia", "Timor", "Indonesia", "Malaysia", "Philippines", "Singapore", "Thailand", "Viet Nam", "Lao People's Democratic Republic"]
+    columns_to_keep = ["COUNTRY","ISO3","TOTAL_VACCINATIONS","PERSONS_FULLY_VACCINATED", "VACCINES_USED"]
+    vaccinationdata_cleaner.clean_raw_data(countries_to_keep, columns_to_keep)
+    json_manager.change_file(vaccinationdata_cleaner.source_file_name)
     json_manager.csv_to_json()
 
 if __name__ == "__main__":
