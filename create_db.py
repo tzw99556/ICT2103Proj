@@ -72,15 +72,6 @@ class MariaDB_Manager:
                 query = f"INSERT INTO {table_name} ({column_str}) VALUES ('{values}');" 
             self.single_query_executor(query)
 
-    def drop_all_worldindata(self):
-        """For debugging, quick method to drop all tables from database"""
-        tables = ["Hospital_admission", "Cases_and_death", "Country_information", "Date", "Country"]
-        for table in tables:
-            query = f"DROP TABLE {table}"
-            self.single_query_executor(query)
-        print(f"Dropped {tables}, exiting")
-        sys.exit(1)
-    
     def get_id_mapppings(self, query) -> dict:
         """Obtain dictionary of [variable]:[variable_id] e.g.,., maps each date / country to its corresponding date_id / country_id"""
         self.single_query_executor(query)
@@ -109,6 +100,15 @@ class MariaDB_Manager:
                 file.write(query)
                 file.write('\n')                
         print(f"{file_name} containing SQL commands generated. \n mariadb > source [path_to_file]")
+    
+    def drop_all_tables(self):
+        """For debugging, quick method to drop all tables from database"""
+        tables = ["Hospital_admission", "Cases_and_death", "Country_information", "Vaccination", "Date", "Country"]
+        for table in tables:
+            query = f"DROP TABLE {table}"
+            self.single_query_executor(query)
+        print(f"Dropped {tables}, exiting")
+        sys.exit(1)
 
 class Tuple_Generator:
     """Class helps to generate and format dataframes"""
@@ -125,13 +125,13 @@ class Tuple_Generator:
         return list(a_df.itertuples(index=False, name=None))
 
     def add_date_id_column(self, date_dict):
-        """Adds a date ID Column"""
+        """Adds a date ID Column to dataframe"""
         date_df = self.df["date"]
         self.df["date_id"] = [date_dict[date] if date in date_dict.keys() else " " for date in date_df] 
 
-    def add_map_id_column(self, map_dict):
-       """Adds a country_id Column"""
-       iso_code_df = self.df["iso_code"]
+    def add_map_id_column(self, map_dict, label):
+       """Adds a country_id Column to dataframe"""
+       iso_code_df = self.df[label]
        self.df["country_id"] = [map_dict[iso] if iso in map_dict.keys() else " " for iso in iso_code_df] 
 
 class TableBuilder_Worldindata:
@@ -146,7 +146,7 @@ class TableBuilder_Worldindata:
         "CREATE TABLE IF NOT EXISTS Date (date_id INT UNSIGNED NOT NULL AUTO_INCREMENT, date VARCHAR(10), PRIMARY KEY (date_id));",
         "CREATE TABLE IF NOT EXISTS Country_information (population_density DECIMAL(6,2), population INT UNSIGNED, stringency_index TINYINT UNSIGNED NOT NULL, date_id INT UNSIGNED NOT NULL, country_id TINYINT UNSIGNED, PRIMARY KEY(date_id, country_id), FOREIGN KEY (date_id) REFERENCES Date(date_id), FOREIGN KEY (country_id) REFERENCES Country(country_id));",
         "CREATE TABLE IF NOT EXISTS Cases_and_death (new_deaths INT UNSIGNED, total_deaths INT UNSIGNED, total_cases INT UNSIGNED, new_cases INT UNSIGNED, date_id INT UNSIGNED NOT NULL, country_id TINYINT UNSIGNED, PRIMARY KEY(date_id, country_id), FOREIGN KEY (date_id) REFERENCES Date(date_id), FOREIGN KEY (country_id) REFERENCES Country(country_id));",
-        "CREATE TABLE IF NOT EXISTS Hospital_admission (icu_patients INT UNSIGNED, hosp_patients INT UNSIGNED, weekly_icu_admissions INT UNSIGNED, weekly_hosp_admissions INT UNSIGNED, date_id INT UNSIGNED NOT NULL, country_id TINYINT UNSIGNED, PRIMARY KEY(date_id, country_id), FOREIGN KEY (date_id) REFERENCES Date(date_id), FOREIGN KEY (country_id) REFERENCES Country(country_id));",
+        "CREATE TABLE IF NOT EXISTS Hospital_admission (hosp_patients INT UNSIGNED, weekly_hosp_admissions INT UNSIGNED, date_id INT UNSIGNED NOT NULL, country_id TINYINT UNSIGNED, PRIMARY KEY(date_id, country_id), FOREIGN KEY (date_id) REFERENCES Date(date_id), FOREIGN KEY (country_id) REFERENCES Country(country_id));",
         ]
         self.mariadb_connector.batch_query_executor(worldindata_create_table_queries)
 
@@ -196,12 +196,32 @@ class TableBuilder_Worldindata:
     def populate_hospital_admission_table(self, worldindata_tuples):
         # Populate Hospital_admission table
         print("Populating Hospital_admission table: ")
-        Hospital_admission_df = worldindata_tuples.get_columns(["icu_patients", "hosp_patients", "weekly_icu_admissions", "weekly_hosp_admissions", "date_id", "country_id"])
+        Hospital_admission_df = worldindata_tuples.get_columns(["hosp_patients", "weekly_hosp_admissions", "date_id", "country_id"])
         Hospital_admission_tuples = worldindata_tuples.get_List_Of_Tuples(Hospital_admission_df)
-        Hospital_admission_columns = ["icu_patients", "hosp_patients", "weekly_icu_admissions", "weekly_hosp_admissions", "date_id", "country_id"]
+        Hospital_admission_columns = ["hosp_patients", "weekly_hosp_admissions", "date_id", "country_id"]
         self.mariadb_connector.insert_executor("Hospital_admission", Hospital_admission_columns, Hospital_admission_tuples)
         print("Hospital_admission table created")
-        
+    
+class TableBuilder_Vaccination:
+    def __init__(self, mariadb_connector) -> None:
+        self.mariadb_connector = mariadb_connector
+
+    def create_tables(self):
+        """Creates Country, Date, Country_information, Cases_and_death, Hospital_admission tables"""
+        worldindata_create_table_queries = [
+            "CREATE TABLE IF NOT EXISTS Vaccination (total_vaccinations INT UNSIGNED, persons_fully_vaccinated INT UNSIGNED, vaccines_used VARCHAR(400), country_id TINYINT UNSIGNED, PRIMARY KEY(country_id), FOREIGN KEY (country_id) REFERENCES Country(country_id));"
+        ]
+        self.mariadb_connector.batch_query_executor(worldindata_create_table_queries)
+
+    def populate_Vaccination_table(self, vaccination_tuples):
+        # Populate Date table
+        print("Populating date table: ")
+        Vaccination_df = vaccination_tuples.get_columns(["TOTAL_VACCINATIONS", "PERSONS_FULLY_VACCINATED", "VACCINES_USED", "country_id"])  
+        Vaccination_tuples = vaccination_tuples.get_List_Of_Tuples(Vaccination_df)
+        Vaccination_columns = ["total_vaccinations", "persons_fully_vaccinated", "vaccines_used", "country_id"]
+        self.mariadb_connector.insert_executor("Vaccination", Vaccination_columns, Vaccination_tuples)
+        print("Vaccination table created")
+
 def main(): 
     """
     Workflow to create and populateworldindata tables in mariadb
@@ -218,27 +238,34 @@ def main():
     mariadb_connector = MariaDB_Manager("yap", "123qwe", "localhost", 3306, "covid_sea_proj")
     
     # (2) Create tables
-    table_builder = TableBuilder_Worldindata(mariadb_connector)
-    table_builder.create_tables()
+    worldindata_tables = TableBuilder_Worldindata(mariadb_connector)
+    worldindata_tables.create_tables()
 
     # (3) Populate data and country tables to get country_id and date_id 
-    worldindata_tuples = Tuple_Generator("[cleaned]-worldindata-covid-allcountries.csv")
-    table_builder.populate_date_table(worldindata_tuples)
-    table_builder.populate_country_table(worldindata_tuples)
+    worldindata_tuples = Tuple_Generator("[cleaned]-worldindata-covid.csv")
+    worldindata_tables.populate_date_table(worldindata_tuples)
+    worldindata_tables.populate_country_table(worldindata_tuples)
 
     # (4) Add date_id and country_id columns to dataframe  
     date_dict = mariadb_connector.map_dates() # date_dict[date]:[date_id]
     map_dict = mariadb_connector.map_countries() # map_dict[country_iso]:[country_id]
     worldindata_tuples.add_date_id_column(date_dict) 
-    worldindata_tuples.add_map_id_column(map_dict)
+    worldindata_tuples.add_map_id_column(map_dict, "iso_code")
     
     # (5) Populate the remaining tables - Country_information_table, Hospital_admission and Cases_and_death
-    table_builder.populate_country_information_table(worldindata_tuples)
-    table_builder.populate_hospital_admission_table(worldindata_tuples)
-    table_builder.populate_cases_and_death_table(worldindata_tuples)
+    worldindata_tables.populate_country_information_table(worldindata_tuples)
+    worldindata_tables.populate_hospital_admission_table(worldindata_tuples)
+    worldindata_tables.populate_cases_and_death_table(worldindata_tuples)
+    
+    # Vaccination table 
+    vaccination_tables = TableBuilder_Vaccination(mariadb_connector)
+    vaccination_tables.create_tables()
+    vaccination_tuples = Tuple_Generator("[cleaned]-vaccination-data.csv")
+    vaccination_tuples.add_map_id_column(map_dict, "ISO3")
+    vaccination_tables.populate_Vaccination_table(vaccination_tuples)
 
     mariadb_connector.generate_sql_file("db-maker.sql")
-    
+
 if __name__ == "__main__":
     main()
 
