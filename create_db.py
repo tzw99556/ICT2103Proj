@@ -231,12 +231,11 @@ def main():
         (4) Insert country_id and date_id into dataframe.
         (5) Populate the remaining tables
         (6) Also generates a .sql script that can be executed in sql client to create database without having to connect to mariadb client in python
-         
     **** Alternatively, run the maker.sql script in mariaDB, if cannot set up mariadb environement in python
     """
     # (1) Creating mariaDB connection and creating Country, Date, Country_information, Cases_and_death and Hospital_admission tables
     mariadb_connector = MariaDB_Manager("yap", "123qwe", "localhost", 3306, "covid_sea_proj")
-
+    # mariadb_connector.drop_all_tables() # for debugging
     # (2) Create tables
     worldindata_tables = TableBuilder_Worldindata(mariadb_connector)
     worldindata_tables.create_tables()
@@ -263,8 +262,12 @@ def main():
     vaccination_tuples = Tuple_Generator("[cleaned]-vaccination-data.csv")
     vaccination_tuples.add_map_id_column(map_dict, "ISO3")
     vaccination_tables.populate_Vaccination_table(vaccination_tuples)
-    mariadb_connector.generate_sql_file("db-maker.sql")
 
+    # Convert date string to Date object
+    date_formatting_query = ["UPDATE Date SET date = STR_TO_DATE(date, '%d/%m/%Y');", "ALTER TABLE Date MODIFY COLUMN date date;"]
+    mariadb_connector.batch_query_executor(date_formatting_query)
+    mariadb_connector.generate_sql_file("db-maker.sql")
+    
 if __name__ == "__main__":
     main()
 
