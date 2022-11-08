@@ -236,7 +236,7 @@ def main():
     """
     # (1) Creating mariaDB connection and creating Country, Date, Country_information, Cases_and_death and Hospital_admission tables
     mariadb_connector = MariaDB_Manager("yap", "123qwe", "localhost", 3306, "covid_sea_proj")
-    
+
     # (2) Create tables
     worldindata_tables = TableBuilder_Worldindata(mariadb_connector)
     worldindata_tables.create_tables()
@@ -263,7 +263,6 @@ def main():
     vaccination_tuples = Tuple_Generator("[cleaned]-vaccination-data.csv")
     vaccination_tuples.add_map_id_column(map_dict, "ISO3")
     vaccination_tables.populate_Vaccination_table(vaccination_tuples)
-
     mariadb_connector.generate_sql_file("db-maker.sql")
 
 if __name__ == "__main__":
