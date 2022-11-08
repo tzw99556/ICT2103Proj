@@ -25,11 +25,13 @@
            <p>&copy; Vizualization Demo</p>
   </footer>
  <script>
-  
+    //checking of values, use tojson to convert to readable format
+    console.log({{values|tojson}})
+    var values = {{values|tojson}}
     // bar chart data
     var chartData = {
     labels : [{% for item in labels %}
-                   "{{item}}",
+                   "{{item[1]}}",
                {% endfor %}],
     datasets : [
        {
@@ -61,7 +63,16 @@
     var ctx = document.getElementById("chart").getContext("2d");
   
     steps = 10
-    max = 40
+    console.log(values)
+    var array = values;
+    var largest= 0;
+
+    for (i=0; i<array.length; i++){
+        if (array[i]>largest) {
+            largest=array[i];
+        }
+    }
+    max = largest
     
     var BarChartDemo = new Chart(ctx).Bar(chartData, {
          scaleOverride: true,

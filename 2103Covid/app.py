@@ -1,11 +1,16 @@
+import sys
+
+import cur as cur
 from flask import Flask,render_template
 from flask import request,jsonify
 from pymongo import MongoClient
 import mysql.connector
+import mariaDB
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
- 
+import mariadb
 app = Flask(__name__)
 
 #mongodb
@@ -13,10 +18,13 @@ client = MongoClient("mongodb://127.0.0.1:27017")
 mydb = client['CovidSEA']
 mycol = mydb['Covid19SEAdata']
 app = Flask('2103proj')
-
-
  
-
+# conn = mariadb.connect(
+#          host='localhost',
+#          user='root',
+#          password='Martinwee1',
+#          database='covid_proj_sea')
+# cur = conn.cursor()
 
 #mariadb
 @app.route("/maria")
@@ -26,31 +34,33 @@ def showSeaData():
  
     mydb = mysql.connector.connect(host="localhost",
                                 user="root",
-                                password="0415",
+                                password="Martinwee1",
                                 database="covid_sea_proj")
     mycursor = mydb.cursor()
 
 
-    # # Fecthing Data From mysql to my python progame
-    mycursor.execute("Select * from country where country_iso = 'IDN'")
+    # # Fetching Data From mysql to my python progame
+    mycursor.execute("select t.total_cases,date from cases_and_death t, date d where d.date_id = t.date_id and date = '19/9/2022';")
     result = mycursor.fetchall()
-   
+    print(result)
+
    #declare the labels you want to display in the graph
     labels = list()
-    i = 0
     #for each row in the sql statement append it into label's list. 
     for row in result:
-      labels.append(row[i])
-    
+      labels.append(row)
+
     #declare the values you want to display in the graph 
     values = list()
     i = 0
+
     #for each row in sql statement , append it to value's list
     for row in result:
        values.append(row[i])
+    print(values)
     # return view of mariahtml , store values in to value variable and labels into labels variable so we can use it to call the 
     # variables in the html page using {{values}}
-    return render_template('maria.html', values=values, labels = labels)
+    return render_template('maria.html', values=values, labels=labels)
 
 
 
@@ -93,6 +103,12 @@ def showData():
     return jsonify(showDataList)
 
 
+# mongo db
+# @app.route('/showData', methods=['GET'])
+# def index():
+    # cur.execute("select t.total_cases from cases_and_death t, date d where d.date_id = t.date_id and date = '19/9/2022'")
+    # data = cur.fetchall()
+    # # return render_template('maria.html', values=data)
 
 if __name__ == '__main__':
     app.config["TEMPLATES_AUTO_RELOAD"] = True
