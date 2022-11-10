@@ -1,0 +1,190 @@
+<!DOCTYPE html><html lang="en"><head> <meta charset="utf-8" />
+  <title>Data Visualization Demo in Flask, Leaflet and ChartJS</title>
+ <!-- import plugin script --> 
+     <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+     <link href="../static/css/jumbotron-narrow.css" rel="stylesheet">
+     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/home.css')}}">
+     <script src="../static/js/jquery-1.11.2.js"></script>
+     <script src="../static/js/Chart.min.js"></script>
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    
+  </head>
+  <body> 
+
+   
+    
+    <div class="container-fluid" style="margin-right: 500px;">
+      <div class="row content">
+        <div class="col-sm-3 sidenav hidden-xs" style="height: 1000px; ">
+          <h2>Statistics</h2>
+          
+        </div>
+        <br>
+        
+        <div class="col-sm-9">
+          <div class="well">
+            <h2>Total confirmed cases to date</h2>
+           
+    <div class="container">
+      <canvas id="chart" width="600" height="400"></canvas>
+    
+    
+      </div>
+          
+          </div>
+          <div class="row">
+            <div class="col-sm-3">
+              <div class="well">
+                <h4>(insert title)</h4>
+                <p>(put graph)</p> 
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="well">
+                <h4>(insert title)</h4>
+                <p>(put graph)</p>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="well">
+                <h4>(insert title)</h4>
+            <p>(put graph)</p>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="well">
+                <h4>(insert title)</h4>
+                <p>(put graph)</p>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <div class="well">
+                <h4>(insert title)</h4>
+                <p>(put graph)</p>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="well">
+                <h4>(insert title)</h4>
+            <p>(put graph)</p>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="well">
+                <h4>(insert title)</h4>
+                <p>(put graph)</p>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-8">
+              <div class="well">
+                <h4>(insert title)</h4>
+                <p>(put graph)</p>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="well">
+                <h4>(insert title)</h4>
+                <p>(put graph)</p> 
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+
+
+
+ <script>
+
+
+    //checking of values, use tojson to convert to readable format
+    console.log({{values|tojson}})
+    var values = {{values|tojson}}
+    
+    // bar chart data
+    var chartData = {
+    labels : [{% for item in labels %}
+                   "{{item[1]}}",
+               {% endfor %}],
+    datasets : [
+       {
+             label: '{{legend}}',
+             fillColor: "rgba(151,187,205,0.2)",
+             strokeColor: "rgba(151,187,205,1)",
+             pointColor: "rgba(151,187,205,1)",
+             pointStrokeColor: "#fff",
+             pointHighlightFill: "#fff",
+             pointHighlightStroke: "rgba(151,187,205,1)",
+             bezierCurve : false,
+             data : [{% for item in values %}
+                       {{item}},
+                     {% endfor %}]
+       }]
+    }
+  
+     Chart.defaults.global.animationSteps = 50;
+     Chart.defaults.global.tooltipYPadding = 16;
+     Chart.defaults.global.tooltipCornerRadius = 0;
+     Chart.defaults.global.tooltipTitleFontStyle = "normal";
+     Chart.defaults.global.tooltipFillColor = "rgba(0,0,0,0.8)";
+     Chart.defaults.global.animationEasing = "easeOutBounce";
+     Chart.defaults.global.responsive = false;
+     Chart.defaults.global.scaleLineColor = "black";
+     Chart.defaults.global.scaleFontSize = 16;
+  
+    // get bar chart canvas
+    var ctx = document.getElementById("chart").getContext("2d");
+  
+    steps = 10
+    console.log(values)
+    var array = values;
+    var largest= 0;
+
+    for (i=0; i<array.length; i++){
+        if (array[i]>largest) {
+            largest=array[i];
+        }
+    }
+    max = largest
+    
+    var BarChartDemo = new Chart(ctx).Bar(chartData, {
+         scaleOverride: true,
+         scaleSteps: steps,
+         scaleStepWidth: Math.ceil(max / steps),
+         scaleStartValue: 0,
+         scaleShowVerticalLines: true,
+         scaleShowGridLines : true,
+         barShowStroke : true,
+         scaleShowLabels: true,
+         bezierCurve: false,
+  
+    });
+    
+
+
+
+
+
+
+
+
+
+
+
+ </script>
+ </body>
+ </html>

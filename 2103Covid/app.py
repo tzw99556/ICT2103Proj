@@ -1,16 +1,13 @@
 import sys
-
-import cur as cur
 from flask import Flask,render_template
 from flask import request,jsonify
 from pymongo import MongoClient
 import mysql.connector
-import mariaDB
 import json
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import mariadb
+
 app = Flask(__name__)
 
 #mongodb
@@ -27,45 +24,6 @@ app = Flask('2103proj')
 # cur = conn.cursor()
 
 #mariadb
-@app.route("/maria")
-def showSeaData():
-    # Connecting to mysql database
-
- 
-    mydb = mysql.connector.connect(host="localhost",
-                                user="root",
-                                password="Martinwee1",
-                                database="covid_sea_proj")
-    mycursor = mydb.cursor()
-
-
-    # # Fetching Data From mysql to my python progame
-    mycursor.execute("select t.total_cases,date from cases_and_death t, date d where d.date_id = t.date_id and date = '19/9/2022';")
-    result = mycursor.fetchall()
-    print(result)
-
-   #declare the labels you want to display in the graph
-    labels = list()
-    #for each row in the sql statement append it into label's list. 
-    for row in result:
-      labels.append(row)
-
-    #declare the values you want to display in the graph 
-    values = list()
-    i = 0
-
-    #for each row in sql statement , append it to value's list
-    for row in result:
-       values.append(row[i])
-    print(values)
-    # return view of mariahtml , store values in to value variable and labels into labels variable so we can use it to call the 
-    # variables in the html page using {{values}}
-    return render_template('maria.html', values=values, labels=labels)
-
-
-
-
-
     # Names = []
     # Marks = []
     
@@ -90,7 +48,46 @@ def showSeaData():
 
 @app.route("/")
 def home():
-   return render_template("")
+  
+    # Connecting to mysql database
+
+ 
+    mydb = mysql.connector.connect(host="localhost",
+                                user="root",
+                                password="0415",
+                                database="covid_sea_proj")
+    mycursor = mydb.cursor()
+
+
+    # # Fetching Data From mysql to my python progame
+    mycursor.execute("SELECT c.total_cases,date FROM cases_and_death c, date d WHERE c.date_id = d.date_id and d.date IN (SELECT max(date) FROM date)")
+    result = mycursor.fetchall()
+
+
+
+
+    print(result)
+
+ 
+
+   #declare the labels you want to display in the graph
+    labels = list()
+    #for each row in the sql statement append it into label's list. 
+    for row in result:
+      labels.append(row)
+
+    #declare the values you want to display in the graph 
+    values = list()
+    i = 0
+
+    #for each row in sql statement , append it to value's list
+    for row in result:
+       values.append(row[i])
+    print(values)
+    # return view of mariahtml , store values in to value variable and labels into labels variable so we can use it to call the 
+    # variables in the html page using {{values}}
+    
+    return render_template("index.html", values=values , labels=labels)
     
 
 #mongo db 
