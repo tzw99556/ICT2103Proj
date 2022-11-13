@@ -10,6 +10,7 @@
      <meta name="viewport" content="width=device-width, initial-scale=1">
      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+     <script src="/static/js/hi.js"></script>
      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
      <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js" type="application/javascript"></script>
     
@@ -25,7 +26,12 @@
           
         </div>
         <br>
-        
+       <div class="col-sm-3">
+              <div class="well">
+                <h3>Total deaths to date(2022)</h3>
+              <span style="font-size: x-large; color:rgb(248, 115, 6);">{{totaldeaths[0]}}</span>
+              </div>
+            </div>
         <div class="col-sm-9">
           <div class="well">
             <h2>Total confirmed cases to date</h2>
@@ -46,16 +52,7 @@
 
 
 
-
-
-
-
-            <div class="col-sm-3">
-              <div class="well">
-                <h4>(insert title)</h4>
-                <p>(put graph)</p>
-              </div>
-            </div>
+            
             <div class="col-sm-3">
               <div class="well">
                 <h4>(insert title)</h4>
@@ -99,7 +96,7 @@
             <div class="col-sm-4">
               <div class="well">
                 <h4>(insert title)</h4>
-               
+              
 
               </div>
             </div>
@@ -173,6 +170,21 @@ let myChart = new Chart(document.getElementById('chart'), {
 
 
 
+
+$(function() {
+    function count($this){
+        var current = parseInt($this.html());
+        $this.html(++current);
+        if(current !== $this.data('count')){
+            setTimeout(function(){count($this)});
+        }
+    }        
+  $("span").each(function() {
+      $(this).data('count', parseInt($(this).html(), 10));
+      $(this).html('357600');
+      count($(this));
+  });
+});
 
 
 </script>
