@@ -63,6 +63,14 @@ def home():
     mycursor = mydb.cursor()
     mycursor1 = mydb.cursor()
     mycursor2 = mydb.cursor()
+    mycursor3 = mydb.cursor()
+
+
+
+    #Percentage of cases and death within population to date
+    mycursor3.execute("SELECT DISTINCT cc.country_name, c.total_deaths, c.total_cases, ci.population, d.date FROM cases_and_death c, date d, country cc, country_information ci WHERE ci.country_id = c.country_id AND cc.country_id = c.country_id AND c.date_id = d.date_id AND d.date IN (SELECT max(date) FROM date)")
+    result3 = mycursor3.fetchall()
+    
 
     #total deaths to date. 
     mycursor2.execute("SELECT SUM(c.total_deaths) FROM cases_and_death c, date d WHERE c.date_id = d.date_id and d.date IN (SELECT max(date) FROM date)")
@@ -79,6 +87,40 @@ def home():
     #total confirmed cases to date query 
     mycursor.execute("SELECT c.total_cases,date FROM cases_and_death c, date d WHERE c.date_id = d.date_id and d.date IN (SELECT max(date) FROM date)")
     result = mycursor.fetchall()
+
+
+
+    
+  #Percentage of cases and death within population to date
+    casesanddeathpopulation = list()
+    for row3 in result3:
+        casesanddeathpopulation.append(row3)
+
+
+
+
+# """ 
+#         #labels for total death and total case
+#     dailyconfirmcase = list()
+#     cambodia = list()
+#     thailand =list()
+#     #for each row in the sql statement append it into label's list. 
+#     for row2 in result3:
+#         if row2[0] == "Cambodia":
+#             cambodia.append(row2)
+
+#         elif row2[0] == "Thailand":
+#             thailand.append(row2)
+
+#      #dailyconfirmcase.append(row2) """
+
+
+
+
+
+
+
+
 
     #total deaths to date label
     totaldeaths = []
@@ -114,7 +156,8 @@ def home():
     # return view of mariahtml , store values in to value variable and labels into labels variable so we can use it to call the 
     # variables in the html page using {{values}}
     
-    return render_template("index.html", values=values , labels=labels, labelstotaldeathandtotalcase=labelstotaldeathandtotalcase, totaldeaths=totaldeaths)
+    return render_template("index.html", values=values , labels=labels, labelstotaldeathandtotalcase=labelstotaldeathandtotalcase, totaldeaths=totaldeaths, 
+   casesanddeathpopulation =  casesanddeathpopulation )
     
 
 #mongo db 
