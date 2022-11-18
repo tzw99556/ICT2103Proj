@@ -27,19 +27,47 @@
        <div class="col-sm-3">
               <div class="well">
                 <h3>Total deaths to date(2022)</h3>
-              <span style="font-size: x-large; color:rgb(248, 115, 6);">{{totaldeaths[0]}}</span>
-              </div>
+              <p style="font-size: x-large; color:rgb(248, 115, 6);">{{totaldeaths[0]}}</p>
+
             </div>
+            <div class="well">
+              <h3> Total number of people vaccinated in SEA countries to date</h3><br>
+
+              <span class="count" style="color:rgb(55, 202, 21); font-size: x-large;">{{vaccinatedSEA[0]}}</span><br><br>
+
+          </div>
+          <div class="well">
+            <h3> Total confirmed cases</h3><br>
+
+            <span class="count" style="color:rgb(154, 33, 33); font-size: x-large;">{{confirmedcases[0]}}</span><br><br>
+
+        </div>
+            </div>
+            
         <div class="col-sm-9">
           <div class="well">
-            <h2>Total confirmed cases to date</h2>
+            <h2>Total confirmed cases to date for each country</h2>
     <div class="container" style="width:800px;">
     
       <canvas id="myChart" width="500" height="200"></canvas>
       <h2>Total deaths to Total cases for each country</h2>
       <canvas id="chart" width="500" height="200"></canvas>
-      <h2>Cases and Death within population to date(19/09/2022)</h2>
-      <canvas id="stackedchart" style="width:100%;max-width:600px"></canvas>
+  
+<div class="pagination">
+  
+  <a href="{{ url_for('index')}}">1</a>
+  <a href="{{ url_for('secondpage')}}">2</a>
+  <a href="#">3</a>
+  <a href="#">4</a>
+  <a href="#">5</a>
+  <a href="#">6</a>
+  <a href="{{ url_for('secondpage')}}">&raquo;</a>
+ 
+</div>
+    
+    
+</div>
+    
       </div>
           </div>
 </div>
@@ -74,6 +102,9 @@
 });
 
 
+
+
+
 //this chart is total cases to total deaths in the country
 let data = [{
   label: 'Total Cases',
@@ -106,13 +137,14 @@ let myChart = new Chart(document.getElementById('chart'), {
     scales: {
       xAxes: [{
         ticks: {
-          beginAtZero: true
+          beginAtZero: false
         }
       }]
     }
   }
 });
 
+//function for onload counter based on <p> tag
 $(function() {
     function count($this){
         var current = parseInt($this.html());
@@ -121,93 +153,24 @@ $(function() {
             setTimeout(function(){count($this)});
         }
     }        
-  $("span").each(function() {
+  $("p").each(function() {
       $(this).data('count', parseInt($(this).html(), 10));
-      $(this).html('357600');
+      $(this).html('357780');
       count($(this));
   });
 });
 
-
-
-
-
-// Percentage of cases and deaths within the population to date CHART
-window.randomScalingFactor = function() {
-		return Math.round(Samples.utils.rand(0, 1000));
-	};
-
-var barChartData = {
-  labels:  [{% for item in casesanddeathpopulation %}
-    "{{item[0]}}",
-    {% endfor %}],
-  datasets: [
-    {label: 'Total Death',
-    backgroundColor: gradient,
-    data: [{% for item in casesanddeathpopulation %}
-    "{{item[1]}}",
-    {% endfor %}]}, 
-     {label: 'Total Cases',
-    backgroundColor: '#E2E2F7',
-    data:  [{% for item in casesanddeathpopulation %}
-    "{{item[2]}}",
-    {% endfor %}]}, 
-    {label: 'Population',
-    backgroundColor: '#09A0CE',
-    data:  [{% for item in casesanddeathpopulation %}
-    "{{item[3]}}",
-    {% endfor %}]},
-
-   
-  ]
-
-};
-var ctx = document.getElementById('stackedchart').getContext('2d'),
-    gradient = ctx.createLinearGradient(0, 0, 0, 450);
-
-gradient.addColorStop(0, 'rgba(255, 0,0, 0.5)');
-gradient.addColorStop(0.5, 'rgba(255, 0,0, 0.25)');
-gradient.addColorStop(1, 'rgba(255, 0,0, 0)');
-
-
-
-
-window.myBar = new Chart(ctx, {
-  type: 'bar',
-  data: barChartData,
-  options: {
-    
-    tooltips: {
-      mode: 'index',
-      intersect: false
-    },
-    responsive: true,
-    scales: {
-      xAxes: [{
-        stacked: true,
-        ticks: {
-        display:true,
-      },
-        gridLines: {
-          display: false,
-          drawBorder: false,
+//function for onload counter
+$('.count').each(function () {
+    $(this).prop('Counter',0).animate({
+        Counter: $(this).text()
+    }, {
+        duration: 1000,
+        easing: 'swing',
+        step: function (now) {
+            $(this).text(Math.ceil(now));
         }
-      }],
-      yAxes: [{
-        stacked: true,
-        gridLines: {
-          drawBorder: false,
-          drawTicks: false,
-          color: '#E2E2F7',
-          borderDash: [3,3],
-          borderDashOffset: 0.5,
-          lineWidth: 3,
-          cornerRadius: 2,
-        }
-      },
-      ]
-    }
-  }
+    });
 });
 
 
