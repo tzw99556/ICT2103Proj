@@ -47,6 +47,83 @@ app = Flask('2103proj')
     # showplot = plt.show()
     # return render_template("maria.html") 
 
+#displays fourth page
+@app.route("/fourthpage")
+def fourthpage():
+    mydb = mysql.connector.connect(host="localhost",
+                                   user="root",
+                                   password="Martinwee1",
+                                   database="covid_sea_proj")
+
+    mycursor = mydb.cursor()
+    # mycursor2 = mydb.cursor()
+    # mycursor3 = mydb.cursor()
+    # mycursor4 = mydb.cursor()
+
+    # Daily Confirmed Cases
+    mycursor.execute(
+        "SELECT t.country_name, c.new_cases, d.date FROM cases_and_death c ,date d, country t WHERE t.country_id = c.country_id and c.date_id = d.date_id")
+    result = mycursor.fetchall()
+
+    # # SUM Total confirmed cases
+    # mycursor2.execute(
+    #     "SELECT SUM(c.total_cases) FROM cases_and_death c, date d WHERE c.date_id = d.date_id and d.date IN (SELECT max(date) FROM date)")
+    # result2 = mycursor2.fetchall()
+    #
+    # # SUM of Total number of people vaccinated in each SEA country to date
+    # mycursor3.execute("SELECT SUM(persons_fully_vaccinated), MAX(date) FROM vaccination, date")
+    # result3 = mycursor3.fetchall()
+    #
+    # # SUM total deaths to date.
+    # mycursor4.execute(
+    #     "SELECT SUM(c.total_deaths) FROM cases_and_death c, date d WHERE c.date_id = d.date_id and d.date IN (SELECT max(date) FROM date)")
+    # result4 = mycursor4.fetchall()
+
+    # Percentage of population vaccinated for each SEA country to date
+    countries = list()
+    SingaporeDict = {}
+    BruneiDict = {}
+    MyanmarDict = {}
+    MalaysiaDict = {}
+    CambodiaDict = {}
+    PhillipinesDict = {}
+    VietnamDict = {}
+    TimorDict = {}
+    ThailandDict = {}
+    LaosDict = {}
+    IndonesiaDict = {}
+    for row in result:
+        if row[0] == "Singapore":
+            SingaporeDict[str(row[2])] = row[1]
+        elif row[0]=="Brunei":
+            BruneiDict[str(row[2])] = row[1]
+        elif row[0]=="Myanmar":
+            MyanmarDict[str(row[2])] = row[1]
+        elif row[0]=="Malaysia":
+            MalaysiaDict[str(row[2])] = row[1]
+        elif row[0]=="Cambodia":
+            CambodiaDict[str(row[2])] = row[1]
+        elif row[0]=="Phillipines":
+            PhillipinesDict[str(row[2])] = row[1]
+        elif row[0]=="Vietnam":
+            VietnamDict[str(row[2])] = row[1]
+        elif row[0]=="Timor":
+            TimorDict[str(row[2])] = row[1]
+        elif row[0]=="Thailand":
+            ThailandDict[str(row[2])] = row[1]
+        elif row[0]=="Laos":
+            LaosDict[str(row[2])] = row[1]
+        elif row[0]=="Indonesia":
+            IndonesiaDict[str(row[2])] = row[1]
+
+
+
+    return render_template("fourthpage.html", SingaporeDict=SingaporeDict,
+                           BruneiDict=BruneiDict, MyanmarDict=MyanmarDict, MalaysiaDict=MalaysiaDict,
+                           CambodiaDict=CambodiaDict,PhillipinesDict=PhillipinesDict, VietnamDict=VietnamDict,
+                           TimorDict=TimorDict, ThailandDict=ThailandDict, LaosDict=LaosDict,
+                           IndonesiaDict=IndonesiaDict)
+
 
 #displays third page
 @app.route("/thirdpage")
@@ -54,7 +131,7 @@ app = Flask('2103proj')
 def thirdpage():
    mydb = mysql.connector.connect(host="localhost",
                                 user="root",
-                                password="0415",
+                                password="Martinwee1",
                                 database="covid_sea_proj")
 
    mycursor = mydb.cursor()
@@ -117,7 +194,7 @@ def secondpage():
 
    mydb = mysql.connector.connect(host="localhost",
                                 user="root",
-                                password="0415",
+                                password="Martinwee1",
                                 database="covid_sea_proj")
 
    mycursor = mydb.cursor()
@@ -190,7 +267,7 @@ def home():
  
     mydb = mysql.connector.connect(host="localhost",
                                 user="root",
-                                password="0415",
+                                password="Martinwee1",
                                 database="covid_sea_proj")
 
     mycursor = mydb.cursor()
