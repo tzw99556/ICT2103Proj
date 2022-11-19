@@ -49,6 +49,7 @@
             <li><a href="#" onclick="ChangeData('Thailand')">Thailand</a></li>
             <li><a href="#" onclick="ChangeData('Laos')">Laos</a></li>
             <li><a href="#" onclick="ChangeData('Indonesia')">Indonesia</a></li>
+            <li><a href="#" onclick="ChangeData('SEA')">SEA</a></li>
           </ul>
         </div>
         <h2>Daily Confirmed COVID-19 Cases to date</h2>
@@ -91,7 +92,7 @@ var TimorDict =  JSON.parse('{{TimorDict | tojson}}');
 var ThailandDict =  JSON.parse('{{ThailandDict | tojson}}');
 var LaosDict =  JSON.parse('{{LaosDict | tojson}}');
 var IndonesiaDict =  JSON.parse('{{IndonesiaDict | tojson}}');
-
+var SEADict = JSON.parse('{{SEADict | tojson}}');
 
 var ctx = document.getElementById("myChart").getContext('2d');
 
@@ -164,6 +165,10 @@ function ChangeData(Country) {
       xValues = Object.keys(IndonesiaDict);
       yValues = Object.values(IndonesiaDict);
       chart.options.title.text = "Indonesia"
+    }else if(Country == "SEA"){
+      xValues = Object.keys(SEADict);
+      yValues = Object.values(SEADict);
+      chart.options.title.text = "SEA"
     }
 
     //changing data labels and dataset

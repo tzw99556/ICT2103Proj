@@ -80,7 +80,7 @@ def fourthpage():
     # result4 = mycursor4.fetchall()
 
     # Percentage of population vaccinated for each SEA country to date
-    countries = list()
+    dates = list()
     SingaporeDict = {}
     BruneiDict = {}
     MyanmarDict = {}
@@ -92,7 +92,13 @@ def fourthpage():
     ThailandDict = {}
     LaosDict = {}
     IndonesiaDict = {}
+    SEADict = {}
     for row in result:
+        if row[2] in dates:
+            SEADict[str(row[2])] += row[1]
+        else:
+            dates.append(row[2])
+            SEADict[str(row[2])] = row[1]
         if row[0] == "Singapore":
             SingaporeDict[str(row[2])] = row[1]
         elif row[0]=="Brunei":
@@ -122,7 +128,7 @@ def fourthpage():
                            BruneiDict=BruneiDict, MyanmarDict=MyanmarDict, MalaysiaDict=MalaysiaDict,
                            CambodiaDict=CambodiaDict,PhillipinesDict=PhillipinesDict, VietnamDict=VietnamDict,
                            TimorDict=TimorDict, ThailandDict=ThailandDict, LaosDict=LaosDict,
-                           IndonesiaDict=IndonesiaDict)
+                           IndonesiaDict=IndonesiaDict, SEADict=SEADict)
 
 
 #displays third page
