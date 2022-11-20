@@ -18,42 +18,18 @@ client = MongoClient("mongodb://127.0.0.1:27017")
 mydb = client['CovidSEA']
 mycol = mydb['Covid19SEAdata']
 app = Flask('2103proj')
- 
-# conn = mariadb.connect(
-#          host='localhost',
-#          user='root',
-#          password='Martinwee1',
-#          database='covid_proj_sea')
-# cur = conn.cursor()
 
 #mariadb
-    # Names = []
-    # Marks = []
-    
-    # for i in mycursor:
-    #     Names.append(i[0])
-    #     Marks.append(i[1])
-        
-    # print("Name of Students = ", Names)
-    # print("Marks of Students = ", Marks)
-    
-    
-    # # Visulizing Data using Matplotlib
-    # plt.bar(Names, Marks)
-    # plt.ylim(0, 5)
-    # plt.xlabel("Name of Students")
-    # plt.ylabel("Marks of Students")
-    # plt.title("Student's Information")
-    # showplot = plt.show()
-    # return render_template("maria.html") 
+mydb = mysql.connector.connect(host="localhost",
+                                   user="root",
+                                   password="0415",
+                                   database="covid_sea_proj")
+
 
 #displays fourth page
 @app.route("/fourthpage")
 def fourthpage():
-    mydb = mysql.connector.connect(host="localhost",
-                                   user="root",
-                                   password="Martinwee1",
-                                   database="covid_sea_proj")
+ 
 
     mycursor = mydb.cursor()
     mycursor2 = mydb.cursor()
@@ -173,10 +149,7 @@ def fourthpage():
 @app.route("/thirdpage")
 
 def thirdpage():
-   mydb = mysql.connector.connect(host="localhost",
-                                user="root",
-                                password="Martinwee1",
-                                database="covid_sea_proj")
+
 
    mycursor = mydb.cursor()
    mycursor2 = mydb.cursor()
@@ -236,10 +209,7 @@ def thirdpage():
 @app.route("/secondpage")
 def secondpage():
 
-   mydb = mysql.connector.connect(host="localhost",
-                                user="root",
-                                password="Martinwee1",
-                                database="covid_sea_proj")
+   
 
    mycursor = mydb.cursor()
    mycursor1 = mydb.cursor()
@@ -308,11 +278,6 @@ def secondpage():
 def home():
 
 
- 
-    mydb = mysql.connector.connect(host="localhost",
-                                user="root",
-                                password="Martinwee1",
-                                database="covid_sea_proj")
 
     mycursor = mydb.cursor()
     mycursor1 = mydb.cursor()
@@ -430,11 +395,6 @@ def index():
 
 
  
-    mydb = mysql.connector.connect(host="localhost",
-                                user="root",
-                                password="0415",
-                                database="covid_sea_proj")
-
     mycursor = mydb.cursor()
     mycursor1 = mydb.cursor()
     mycursor2 = mydb.cursor()
