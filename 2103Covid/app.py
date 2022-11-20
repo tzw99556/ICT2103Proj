@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.graph_objects as go
-
+from datetime import datetime, timedelta
 
 
 app = Flask(__name__)
@@ -56,7 +56,7 @@ def fourthpage():
                                    database="covid_sea_proj")
 
     mycursor = mydb.cursor()
-    # mycursor2 = mydb.cursor()
+    mycursor2 = mydb.cursor()
     # mycursor3 = mydb.cursor()
     # mycursor4 = mydb.cursor()
 
@@ -65,22 +65,13 @@ def fourthpage():
         "SELECT t.country_name, c.new_cases, d.date FROM cases_and_death c ,date d, country t WHERE t.country_id = c.country_id and c.date_id = d.date_id")
     result = mycursor.fetchall()
 
-    # # SUM Total confirmed cases
-    # mycursor2.execute(
-    #     "SELECT SUM(c.total_cases) FROM cases_and_death c, date d WHERE c.date_id = d.date_id and d.date IN (SELECT max(date) FROM date)")
-    # result2 = mycursor2.fetchall()
-    #
-    # # SUM of Total number of people vaccinated in each SEA country to date
-    # mycursor3.execute("SELECT SUM(persons_fully_vaccinated), MAX(date) FROM vaccination, date")
-    # result3 = mycursor3.fetchall()
-    #
-    # # SUM total deaths to date.
-    # mycursor4.execute(
-    #     "SELECT SUM(c.total_deaths) FROM cases_and_death c, date d WHERE c.date_id = d.date_id and d.date IN (SELECT max(date) FROM date)")
-    # result4 = mycursor4.fetchall()
+    # Daily Confirmed Deaths
+    mycursor2.execute(
+        "SELECT t.country_name, c.new_deaths, d.date FROM cases_and_death c ,date d, country t WHERE t.country_id = c.country_id and c.date_id = d.date_id")
+    result2 = mycursor2.fetchall()
 
-    # Percentage of population vaccinated for each SEA country to date
-    dates = list()
+    # Covid-19 Cases for each SEA country to date
+    Coviddates = list()
     SingaporeDict = {}
     BruneiDict = {}
     MyanmarDict = {}
@@ -93,11 +84,24 @@ def fourthpage():
     LaosDict = {}
     IndonesiaDict = {}
     SEADict = {}
+    deathDates = list()
+    SingaporeDeaths = {}
+    BruneiDeaths = {}
+    MyanmarDeaths = {}
+    MalaysiaDeaths = {}
+    CambodiaDeaths = {}
+    PhillipinesDeaths = {}
+    VietnamDeaths = {}
+    TimorDeaths = {}
+    ThailandDeaths = {}
+    LaosDeaths = {}
+    IndonesiaDeaths = {}
+    SEADeaths = {}
     for row in result:
-        if row[2] in dates:
+        if row[2] in Coviddates:
             SEADict[str(row[2])] += row[1]
         else:
-            dates.append(row[2])
+            Coviddates.append(row[2])
             SEADict[str(row[2])] = row[1]
         if row[0] == "Singapore":
             SingaporeDict[str(row[2])] = row[1]
@@ -122,13 +126,47 @@ def fourthpage():
         elif row[0]=="Indonesia":
             IndonesiaDict[str(row[2])] = row[1]
 
-
+    for row in result2:
+        if row[2] in deathDates:
+            SEADeaths[str(row[2])] += row[1]
+        else:
+            deathDates.append(row[2])
+            SEADeaths[str(row[2])] = row[1]
+        if row[0] == "Singapore":
+            SingaporeDeaths[str(row[2])] = row[1]
+        elif row[0]=="Brunei":
+            BruneiDeaths[str(row[2])] = row[1]
+        elif row[0]=="Myanmar":
+            MyanmarDeaths[str(row[2])] = row[1]
+        elif row[0]=="Malaysia":
+            MalaysiaDeaths[str(row[2])] = row[1]
+        elif row[0]=="Cambodia":
+            CambodiaDeaths[str(row[2])] = row[1]
+        elif row[0]=="Phillipines":
+            PhillipinesDeaths[str(row[2])] = row[1]
+        elif row[0]=="Vietnam":
+            VietnamDeaths[str(row[2])] = row[1]
+        elif row[0]=="Timor":
+            TimorDeaths[str(row[2])] = row[1]
+        elif row[0]=="Thailand":
+            ThailandDeaths[str(row[2])] = row[1]
+        elif row[0]=="Laos":
+            LaosDeaths[str(row[2])] = row[1]
+        elif row[0]=="Indonesia":
+            IndonesiaDeaths[str(row[2])] = row[1]
 
     return render_template("fourthpage.html", SingaporeDict=SingaporeDict,
                            BruneiDict=BruneiDict, MyanmarDict=MyanmarDict, MalaysiaDict=MalaysiaDict,
                            CambodiaDict=CambodiaDict,PhillipinesDict=PhillipinesDict, VietnamDict=VietnamDict,
                            TimorDict=TimorDict, ThailandDict=ThailandDict, LaosDict=LaosDict,
-                           IndonesiaDict=IndonesiaDict, SEADict=SEADict)
+                           IndonesiaDict=IndonesiaDict, SEADict=SEADict,
+                           SingaporeDeaths=SingaporeDeaths,
+                           BruneiDeaths=BruneiDeaths, MyanmarDeaths=MyanmarDeaths, MalaysiaDeaths=MalaysiaDeaths,
+                           CambodiaDeaths=CambodiaDeaths, PhillipinesDeaths=PhillipinesDeaths,
+                           VietnamDeaths=VietnamDeaths,TimorDeaths=TimorDeaths,
+                           ThailandDeaths=ThailandDeaths, LaosDeaths=LaosDeaths,
+                           IndonesiaDeaths=IndonesiaDeaths, SEADeaths=SEADeaths
+                           )
 
 
 #displays third page
