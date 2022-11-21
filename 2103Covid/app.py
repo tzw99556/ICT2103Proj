@@ -1,13 +1,9 @@
+#!/usr/bin/env python3
 import sys
 from flask import Flask,render_template, url_for
 from flask import request,jsonify
 from pymongo import MongoClient
 import mysql.connector
-import json
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-import plotly.graph_objects as go
 from datetime import datetime, timedelta
 
 
@@ -21,8 +17,8 @@ app = Flask('2103proj')
 
 #mariadb
 mydb = mysql.connector.connect(host="localhost",
-                                   user="root",
-                                   password="0405",
+                                   user="yap",
+                                   password="123qwe",
                                    database="covid_sea_proj")
 
 
@@ -149,8 +145,6 @@ def fourthpage():
 @app.route("/thirdpage")
 
 def thirdpage():
-
-
    mycursor = mydb.cursor()
    mycursor2 = mydb.cursor()
    mycursor3 = mydb.cursor()
@@ -202,15 +196,9 @@ def thirdpage():
 
 
 
-
-
-
 #display 2nd page
 @app.route("/secondpage")
 def secondpage():
-
-   
-
    mycursor = mydb.cursor()
    mycursor1 = mydb.cursor()
    mycursor2 = mydb.cursor()
@@ -233,8 +221,6 @@ def secondpage():
    mycursor3.execute("SELECT SUM(persons_fully_vaccinated), MAX(date) FROM vaccination, date")
    result3 = mycursor3.fetchall()
 
-
-
     #SUM total deaths to date. 
    mycursor4.execute("SELECT SUM(c.total_deaths) FROM cases_and_death c, date d WHERE c.date_id = d.date_id and d.date IN (SELECT max(date) FROM date)")
    result4 = mycursor4.fetchall() 
@@ -243,9 +229,6 @@ def secondpage():
    confirmedcases = []
    for row2 in result2:
        confirmedcases.append(str(row2[0]))
-
-
-
 
     #total vaccinated in SEA
    vaccinatedSEA = []
@@ -276,18 +259,12 @@ def secondpage():
 #onload page
 @app.route("/")
 def home():
-
-
-
     mycursor = mydb.cursor()
     mycursor1 = mydb.cursor()
     mycursor2 = mydb.cursor()
-
     mycursor5 = mydb.cursor()
     mycursor6 = mydb.cursor()
 
-
-    
     #SUM Total confirmed cases
     mycursor6.execute("SELECT SUM(c.total_cases) FROM cases_and_death c, date d WHERE c.date_id = d.date_id and d.date IN (SELECT max(date) FROM date)")
     result6 = mycursor6.fetchall()
@@ -311,10 +288,6 @@ def home():
     #total confirmed cases to date query 
     mycursor.execute("SELECT c.total_cases,date FROM cases_and_death c, date d WHERE c.date_id = d.date_id and d.date IN (SELECT max(date) FROM date)")
     result = mycursor.fetchall()
-
-  
-
-
 
     #total confirmed cases
     confirmedcases = []

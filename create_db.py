@@ -148,7 +148,7 @@ class TableBuilder_Worldindata:
         "CREATE TABLE IF NOT EXISTS Country_information (population_density DECIMAL(6,2), population INT UNSIGNED, stringency_index TINYINT UNSIGNED NOT NULL, date_id INT UNSIGNED NOT NULL, country_id TINYINT UNSIGNED, PRIMARY KEY(date_id, country_id), FOREIGN KEY (date_id) REFERENCES Date(date_id), FOREIGN KEY (country_id) REFERENCES Country(country_id));",
         "CREATE TABLE IF NOT EXISTS Cases_and_death (new_deaths INT UNSIGNED, total_deaths INT UNSIGNED, total_cases INT UNSIGNED, new_cases INT UNSIGNED, date_id INT UNSIGNED NOT NULL, country_id TINYINT UNSIGNED, PRIMARY KEY(date_id, country_id), FOREIGN KEY (date_id) REFERENCES Date(date_id), FOREIGN KEY (country_id) REFERENCES Country(country_id));",
         "CREATE TABLE IF NOT EXISTS Hospital_admission (hosp_patients INT UNSIGNED, weekly_hosp_admissions INT UNSIGNED, date_id INT UNSIGNED NOT NULL, country_id TINYINT UNSIGNED, PRIMARY KEY(date_id, country_id), FOREIGN KEY (date_id) REFERENCES Date(date_id), FOREIGN KEY (country_id) REFERENCES Country(country_id));",
-        "CREATE TABLE IF NOT EXISTS Accounts (username VARCHAR(45), password VARCHAR(45))"]
+        "CREATE TABLE IF NOT EXISTS Accounts (username VARCHAR(45), password VARCHAR(45));"]
         self.mariadb_connector.batch_query_executor(worldindata_create_table_queries)
 
     def populate_a_new_table(self, worldindata_tuples):
@@ -269,7 +269,6 @@ def main():
     vaccination_tuples.add_map_id_column(map_dict, "ISO3")
     vaccination_tables.populate_Vaccination_table(vaccination_tuples)
     
-
     # Convert date string to Date object
     date_formatting_query = ["UPDATE Date SET date = STR_TO_DATE(date, '%d/%m/%Y');", "ALTER TABLE Date MODIFY COLUMN date date;"]
     mariadb_connector.batch_query_executor(date_formatting_query)

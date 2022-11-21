@@ -1,13 +1,9 @@
+#!/usr/bin/env python3
+
 import sys
 from flask import Flask,render_template, url_for
 from flask import request,jsonify
 import mysql.connector
-import json
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-import plotly.graph_objects as go
-from datetime import datetime, timedelta
 import pymongo
 
 
@@ -20,11 +16,7 @@ client = pymongo.MongoClient("mongodb://127.0.0.1:27017")
 mydb = client['CovidSEA']
 #collections
 mycol = mydb['Covid19SEAdata']
-
-
 app = Flask('2103proj')
-
-
 
 
 #1st , any mongodb query will be declared through this statement '
@@ -36,21 +28,15 @@ myquery = { "iso_code": "BRN"}
 #insertmany , insert one depending on the mongo query you need. 
 mydoc = mycol.find(myquery)
 
-
-
 #mongo db 
 @app.route('/')
 def showData():
-
         #3rd , declare a variable to store the queries you want to find 
         h = mydoc 
-            
         #return render template to index html. and store the variable in the variable so in the html you can call the variable to display it. 
         return render_template('index.html', h=h)
        
   
-
-
 
 if __name__ == '__main__':
     app.config["TEMPLATES_AUTO_RELOAD"] = True

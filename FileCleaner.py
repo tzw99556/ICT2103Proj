@@ -67,7 +67,7 @@ def main():
     countries_to_keep = ["Brunei", "Myanmar", "Cambodia", "Timor", "Indonesia", "Malaysia", "Philippines", "Singapore", "Thailand", "Viet Nam", "Lao People's Democratic Republic"]
     columns_to_keep = ["COUNTRY","ISO3","TOTAL_VACCINATIONS","PERSONS_FULLY_VACCINATED", "VACCINES_USED"]
     vaccinationdata_cleaner.clean_raw_data(countries_to_keep, columns_to_keep)
-    json_manager.change_file(vaccinationdata_cleaner.source_file_name)
+    json_manager = JsonManager(vaccinationdata_cleaner.dest_file_name)
     json_manager.csv_to_json()
 
 if __name__ == "__main__":
