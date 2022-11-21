@@ -70,16 +70,6 @@
             
   </div>
   
-  
-  
-  
-            
-          
-  
-      
- 
-  
-  
 
   <script>
 //various Date to Confirmed Cases keyvalue pairs
@@ -203,6 +193,9 @@ function ChangeData(Country) {
       xValues = Object.keys(VietnamDict);
       yValues = Object.values(VietnamDict);
       chart.options.title.text = "Vietnam"
+      xValues2 = Object.keys(VietnamDeaths);
+      yValues2 = Object.values(VietnamDeaths);
+      chart2.options.title.text = "Vietnam"
     }else if(Country == "Timor"){
       xValues = Object.keys(TimorDict);
       yValues = Object.values(TimorDict);

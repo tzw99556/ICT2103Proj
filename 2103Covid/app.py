@@ -22,6 +22,95 @@ mydb = mysql.connector.connect(host="localhost",
                                    database="covid_sea_proj")
 
 
+# displays fifth page
+@app.route("/fifthpage")
+def fifthpage():
+    mycursor = mydb.cursor()
+
+    # Number of ICU and Hospitalized patients out of all new cases
+    mycursor.execute(
+        "select c.country_name, d.date, h.hosp_patients, n.new_cases from country c, date d, cases_and_death n, hospital_admission h where c.country_id = n.country_id and c.country_id = h.country_id and d.date_id = h.date_id and d.date_id = n.date_id and d.date_id = h.date_id")
+    result = mycursor.fetchall()
+
+    # Covid-19 Cases for each SEA country to date
+    ICUDates = list()
+    SingaporeICUDict = {}
+    BruneiICUDict = {}
+    MyanmarICUDict = {}
+    MalaysiaICUDict = {}
+    CambodiaICUDict = {}
+    PhillipinesICUDict = {}
+    VietnamICUDict = {}
+    TimorICUDict = {}
+    ThailandICUDict = {}
+    LaosICUDict = {}
+    IndonesiaICUDict = {}
+    SEAICUDict = {}
+    # SingaporeHosp = {}
+    # BruneiHosp = {}
+    # MyanmarHosp = {}
+    # MalaysiaHosp = {}
+    # CambodiaHosp = {}
+    # PhillipinesHosp = {}
+    # VietnamHosp = {}
+    # TimorHosp = {}
+    # ThailandHosp = {}
+    # LaosHosp = {}
+    # IndonesiaHosp = {}
+    # SEAHosp = {}
+    for row in result:
+        if row[1] in ICUDates:
+            # SEAHosp[str(row[1])] += row[2]
+            SEAICUDict[str(row[1])] += row[3]
+        else:
+            ICUDates.append(row[1])
+            # SEAHosp[str(row[1])] = row[2]
+            SEAICUDict[str(row[1])] = row[3]
+        if row[0] == "Singapore":
+            # SingaporeHosp[str(row[1])] = row[2]
+            SingaporeICUDict[str(row[1])] = row[3]
+        elif row[0] == "Brunei":
+            # BruneiHosp[str(row[1])] = row[2]
+            BruneiICUDict[str(row[1])] = row[3]
+        elif row[0] == "Myanmar":
+            # MyanmarHosp[str(row[1])] = row[2]
+            MyanmarICUDict[str(row[1])] = row[3]
+        elif row[0] == "Malaysia":
+            # MalaysiaHosp[str(row[1])] = row[2]
+            MalaysiaICUDict[str(row[1])] = row[3]
+        elif row[0] == "Cambodia":
+            # CambodiaHosp[str(row[1])] = row[2]
+            CambodiaICUDict[str(row[1])] = row[3]
+        elif row[0] == "Philippines":
+            # PhillipinesHosp[str(row[1])] = row[2]
+            PhillipinesICUDict[str(row[1])] = row[3]
+        elif row[0] == "Vietnam":
+            # VietnamHosp[str(row[1])] = row[2]
+            VietnamICUDict[str(row[1])] = row[3]
+        elif row[0] == "Timor":
+            # TimorHosp[str(row[1])] = row[2]
+            TimorICUDict[str(row[1])] = row[3]
+        elif row[0] == "Thailand":
+            # ThailandHosp[str(row[1])] = row[2]
+            ThailandICUDict[str(row[1])] = row[3]
+        elif row[0] == "Laos":
+            # LaosHosp[str(row[1])] = row[2]
+            LaosICUDict[str(row[1])] = row[3]
+        elif row[0] == "Indonesia":
+            # IndonesiaHosp[str(row[1])] = row[2]
+            IndonesiaICUDict[str(row[1])] = row[3]
+
+    return render_template("fifthpage.html",
+                           SingaporeICUDict=SingaporeICUDict,
+                           BruneiICUDict=BruneiICUDict, MyanmarICUDict=MyanmarICUDict,
+                           MalaysiaICUDict=MalaysiaICUDict,
+                           CambodiaICUDict=CambodiaICUDict, PhillipinesICUDict=PhillipinesICUDict,
+                           VietnamICUDict=VietnamICUDict, TimorICUDict=TimorICUDict,
+                           ThailandICUDict=ThailandICUDict, LaosICUDict=LaosICUDict,
+                           IndonesiaICUDict=IndonesiaICUDict, SEAICUDict=SEAICUDict
+                           )
+
+
 #displays fourth page
 @app.route("/fourthpage")
 def fourthpage():
