@@ -7,7 +7,7 @@ mydb = myclient["CovidSEA"]
 mycol = mydb["worldindata"]
 mycol2 = mydb["vaccination"]
 
-with open('[JSON]-[cleaned]-worldindata-covid-allcountries.csv') as file1:
+with open('[JSON]-[cleaned]-worldindata-covid.csv') as file1:
 
         file_data1 = json.load(file1)
     
@@ -19,7 +19,7 @@ if isinstance(file_data1, list):
     mycol.insert_many(file_data1) 
 
 # Loading or Opening the json file
-with open('[JSON]-vaccination-data.csv') as file:
+with open('[JSON]-[cleaned]-vaccination-data.csv') as file:
    
     file_data = json.load(file)
     
