@@ -22,7 +22,7 @@ app = Flask('2103proj')
 #mariadb
 mydb = mysql.connector.connect(host="localhost",
                                    user="root",
-                                   password="0415",
+                                   password="0405",
                                    database="covid_sea_proj")
 
 
@@ -89,7 +89,7 @@ def fourthpage():
             MalaysiaDict[str(row[2])] = row[1]
         elif row[0]=="Cambodia":
             CambodiaDict[str(row[2])] = row[1]
-        elif row[0]=="Phillipines":
+        elif row[0]=="Philippines":
             PhillipinesDict[str(row[2])] = row[1]
         elif row[0]=="Vietnam":
             VietnamDict[str(row[2])] = row[1]
@@ -118,7 +118,7 @@ def fourthpage():
             MalaysiaDeaths[str(row[2])] = row[1]
         elif row[0]=="Cambodia":
             CambodiaDeaths[str(row[2])] = row[1]
-        elif row[0]=="Phillipines":
+        elif row[0]=="Philippines":
             PhillipinesDeaths[str(row[2])] = row[1]
         elif row[0]=="Vietnam":
             VietnamDeaths[str(row[2])] = row[1]
