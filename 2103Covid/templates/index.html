@@ -21,10 +21,10 @@
    
     
     <div class="container-fluid" style="margin-right: 500px;">
-      <div class="row content">
+      <div class="row content" >
        
         <br>
-       <div class="col-sm-3">
+       <div class="col-sm-3" >
               <div class="well">
                 <h3>Total deaths to date(2022)</h3>
               <p style="font-size: x-large; color:rgb(248, 115, 6);">{{totaldeaths[0]}}</p>
@@ -44,8 +44,8 @@
         </div>
             </div>
             
-        <div class="col-sm-9">
-          <div class="well">
+        <div class="col-sm-9" >
+          <div class="well"style="width: 900px;">
             <h2>Total confirmed cases to date for each country</h2>
     <div class="container" style="width:800px;">
     
@@ -57,8 +57,8 @@
   
   <a href="{{ url_for('index')}}">1</a>
   <a href="{{ url_for('secondpage')}}">2</a>
-  <a href="#">3</a>
-  <a href="#">4</a>
+  <a href="{{ url_for('thirdpage')}}">3</a>
+  <a href="{{ url_for('fourthpage')}}">4</a>
   <a href="#">5</a>
   <a href="#">6</a>
   <a href="{{ url_for('secondpage')}}">&raquo;</a>
