@@ -346,9 +346,23 @@ def secondpage():
 
 #onload page
 @app.route("/")
-def home():
+def login():
    
-
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+        username = request.form['username']
+        password = request.form['password']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT * FROM accounts WHERE username = % s AND password = % s', (username, password, ))
+        account = cursor.fetchone()
+        if account:
+            session['loggedin'] = True
+            session['id'] = account['id']
+            session['username'] = account['username']
+            msg = 'Logged in successfully !'
+            return render_template('index.html', msg = msg)
+        else:
+            msg = 'Incorrect username / password !'
+    return render_template('login.html', msg = msg)
     # Connecting to mysql database
     return render_template("login.html")
 
@@ -406,23 +420,6 @@ def index():
     for row6 in result5:
         vaccinatedSEA.append(str(row6[0]))
 
-
-# """ 
-#         #labels for total death and total case
-#     dailyconfirmcase = list()
-#     cambodia = list()
-#     thailand =list()
-#     #for each row in the sql statement append it into label's list. 
-#     for row2 in result3:
-#         if row2[0] == "Cambodia":
-#             cambodia.append(row2)
-
-#         elif row2[0] == "Thailand":
-#             thailand.append(row2)
-
-#      #dailyconfirmcase.append(row2) """
-
-
     #total deaths to date label
     totaldeaths = []
     for row2 in result2:
@@ -445,19 +442,14 @@ def index():
     #declare the values you want to display in the graph 
     values = list()
     i = 0
-
+    
     #for each row in sql statement , append it to value's list
     for row in result:
        values.append(row[i])
     print(values)
     # return view of mariahtml , store values in to value variable and labels into labels variable so we can use it to call the 
     # variables in the html page using {{values}}
-    if request.method == 'POST':
-        # do stuff when the form is submitted
-
-        # redirect to end the POST handling
-        # the redirect can be to the same route or somewhere else
-      return redirect(url_for('index'))
+   
     # Connecting to mysql database
     return render_template("index.html", values=values , labels=labels, labelstotaldeathandtotalcase=labelstotaldeathandtotalcase, totaldeaths=totaldeaths, 
        vaccinatedSEA=vaccinatedSEA, confirmedcases=confirmedcases
