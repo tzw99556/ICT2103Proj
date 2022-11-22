@@ -3,7 +3,7 @@ from flask import Flask,render_template, url_for
 from flask import request,jsonify
 from pymongo import MongoClient
 import mysql.connector
-from datetime import datetime, timedelta
+import datetime
 
 
 app = Flask(__name__)
@@ -17,7 +17,7 @@ app = Flask('2103proj')
 #mariadb
 mydb = mysql.connector.connect(host="localhost",
                                    user="root",
-                                   password="0415",
+                                   password="Martinwee1",
                                    database="covid_sea_proj")
 
 
@@ -45,19 +45,34 @@ def fifthpage():
     LaosICUDict = {}
     IndonesiaICUDict = {}
     SEAICUDict = {}
-    # SingaporeHosp = {}
-    # BruneiHosp = {}
-    # MyanmarHosp = {}
-    # MalaysiaHosp = {}
-    # CambodiaHosp = {}
-    # PhillipinesHosp = {}
-    # VietnamHosp = {}
-    # TimorHosp = {}
-    # ThailandHosp = {}
-    # LaosHosp = {}
-    # IndonesiaHosp = {}
-    # SEAHosp = {}
+    WeeklyVal = list()
+    SEAWeeklyVal = {}
+    SingaporeWeeklyVal = {}
+    BruneiWeeklyVal = {}
+    MyanmarWeeklyVal = {}
+    MalaysiaWeeklyVal = {}
+    CambodiaWeeklyVal = {}
+    PhilippinesWeeklyVal = {}
+    VietnamWeeklyVal = {}
+    TimorWeeklyVal = {}
+    ThailandWeeklyVal = {}
+    LaosWeeklyVal = {}
+    IndonesiaWeeklyVal = {}
+    day = 0
+    month = 0
+    year = 0
     for row in result:
+        day = row[1].day
+        month = row[1].month
+        year = row[1].year
+        isoDate = datetime.datetime(year,month,day).isocalendar()
+        firstDay = datetime.date.fromisocalendar(isoDate.year, isoDate.week, 7)
+        if str(isoDate.week)+ str(row[1].year) in WeeklyVal:
+            SEAWeeklyVal[str(firstDay)] += row[3]
+        else:
+            SEAWeeklyVal[str(firstDay)] = row[3]
+            WeeklyVal.append(str(isoDate.week)+
+                             str(row[1].year))
         if row[1] in ICUDates:
             # SEAHosp[str(row[1])] += row[2]
             SEAICUDict[str(row[1])] += row[3]
@@ -66,39 +81,72 @@ def fifthpage():
             # SEAHosp[str(row[1])] = row[2]
             SEAICUDict[str(row[1])] = row[3]
         if row[0] == "Singapore":
-            # SingaporeHosp[str(row[1])] = row[2]
             SingaporeICUDict[str(row[1])] = row[3]
-        elif row[0] == "Brunei":
-            # BruneiHosp[str(row[1])] = row[2]
-            BruneiICUDict[str(row[1])] = row[3]
-        elif row[0] == "Myanmar":
-            # MyanmarHosp[str(row[1])] = row[2]
-            MyanmarICUDict[str(row[1])] = row[3]
-        elif row[0] == "Malaysia":
-            # MalaysiaHosp[str(row[1])] = row[2]
-            MalaysiaICUDict[str(row[1])] = row[3]
-        elif row[0] == "Cambodia":
-            # CambodiaHosp[str(row[1])] = row[2]
-            CambodiaICUDict[str(row[1])] = row[3]
-        elif row[0] == "Philippines":
-            # PhillipinesHosp[str(row[1])] = row[2]
-            PhillipinesICUDict[str(row[1])] = row[3]
-        elif row[0] == "Vietnam":
-            # VietnamHosp[str(row[1])] = row[2]
-            VietnamICUDict[str(row[1])] = row[3]
-        elif row[0] == "Timor":
-            # TimorHosp[str(row[1])] = row[2]
-            TimorICUDict[str(row[1])] = row[3]
-        elif row[0] == "Thailand":
-            # ThailandHosp[str(row[1])] = row[2]
-            ThailandICUDict[str(row[1])] = row[3]
-        elif row[0] == "Laos":
-            # LaosHosp[str(row[1])] = row[2]
-            LaosICUDict[str(row[1])] = row[3]
-        elif row[0] == "Indonesia":
-            # IndonesiaHosp[str(row[1])] = row[2]
-            IndonesiaICUDict[str(row[1])] = row[3]
+            if str(firstDay) in SingaporeWeeklyVal:
+                SingaporeWeeklyVal[str(firstDay)] += row[3]
+            else:
+                SingaporeWeeklyVal[str(firstDay)] = row[3]
 
+        elif row[0] == "Brunei":
+            BruneiICUDict[str(row[1])] = row[3]
+            if str(firstDay) in BruneiWeeklyVal:
+                BruneiWeeklyVal[str(firstDay)] += row[3]
+            else:
+                BruneiWeeklyVal[str(firstDay)] = row[3]
+        elif row[0] == "Myanmar":
+            MyanmarICUDict[str(row[1])] = row[3]
+            if str(firstDay) in MyanmarWeeklyVal:
+                MyanmarWeeklyVal[str(firstDay)] += row[3]
+            else:
+                MyanmarWeeklyVal[str(firstDay)] = row[3]
+        elif row[0] == "Malaysia":
+            MalaysiaICUDict[str(row[1])] = row[3]
+            if str(firstDay) in MalaysiaWeeklyVal:
+                MalaysiaWeeklyVal[str(firstDay)] += row[3]
+            else:
+                MalaysiaWeeklyVal[str(firstDay)] = row[3]
+        elif row[0] == "Cambodia":
+            CambodiaICUDict[str(row[1])] = row[3]
+            if str(firstDay) in CambodiaWeeklyVal:
+                CambodiaWeeklyVal[str(firstDay)] += row[3]
+            else:
+                CambodiaWeeklyVal[str(firstDay)] = row[3]
+        elif row[0] == "Philippines":
+            PhillipinesICUDict[str(row[1])] = row[3]
+            if str(firstDay) in PhilippinesWeeklyVal:
+                PhilippinesWeeklyVal[str(firstDay)] += row[3]
+            else:
+                PhilippinesWeeklyVal[str(firstDay)] = row[3]
+        elif row[0] == "Vietnam":
+            VietnamICUDict[str(row[1])] = row[3]
+            if str(firstDay) in VietnamWeeklyVal:
+                VietnamWeeklyVal[str(firstDay)] += row[3]
+            else:
+                VietnamWeeklyVal[str(firstDay)] = row[3]
+        elif row[0] == "Timor":
+            TimorICUDict[str(row[1])] = row[3]
+            if str(firstDay) in TimorWeeklyVal:
+                TimorWeeklyVal[str(firstDay)] += row[3]
+            else:
+                TimorWeeklyVal[str(firstDay)] = row[3]
+        elif row[0] == "Thailand":
+            ThailandICUDict[str(row[1])] = row[3]
+            if str(firstDay) in ThailandWeeklyVal:
+                ThailandWeeklyVal[str(firstDay)] += row[3]
+            else:
+                ThailandWeeklyVal[str(firstDay)] = row[3]
+        elif row[0] == "Laos":
+            LaosICUDict[str(row[1])] = row[3]
+            if str(firstDay) in LaosWeeklyVal:
+                LaosWeeklyVal[str(firstDay)] += row[3]
+            else:
+                LaosWeeklyVal[str(firstDay)] = row[3]
+        elif row[0] == "Indonesia":
+            IndonesiaICUDict[str(row[1])] = row[3]
+            if str(firstDay) in IndonesiaWeeklyVal:
+                IndonesiaWeeklyVal[str(firstDay)] += row[3]
+            else:
+                IndonesiaWeeklyVal[str(firstDay)] = row[3]
     return render_template("fifthpage.html",
                            SingaporeICUDict=SingaporeICUDict,
                            BruneiICUDict=BruneiICUDict, MyanmarICUDict=MyanmarICUDict,
@@ -106,7 +154,14 @@ def fifthpage():
                            CambodiaICUDict=CambodiaICUDict, PhillipinesICUDict=PhillipinesICUDict,
                            VietnamICUDict=VietnamICUDict, TimorICUDict=TimorICUDict,
                            ThailandICUDict=ThailandICUDict, LaosICUDict=LaosICUDict,
-                           IndonesiaICUDict=IndonesiaICUDict, SEAICUDict=SEAICUDict
+                           IndonesiaICUDict=IndonesiaICUDict, SEAICUDict=SEAICUDict,
+                           SEAWeeklyVal = SEAWeeklyVal,SingaporeWeeklyVal=SingaporeWeeklyVal,
+                           BruneiWeeklyVal=BruneiWeeklyVal, MyanmarWeeklyVal=MyanmarWeeklyVal,
+                           MalaysiaWeeklyVal=MalaysiaWeeklyVal,
+                           CambodiaWeeklyVal=CambodiaWeeklyVal, PhilippinesWeeklyVal=PhilippinesWeeklyVal,
+                           VietnamWeeklyVal=VietnamWeeklyVal, TimorWeeklyVal=TimorWeeklyVal,
+                           ThailandWeeklyVal=ThailandWeeklyVal, LaosWeeklyVal=LaosWeeklyVal,
+                           IndonesiaWeeklyVal=IndonesiaWeeklyVal
                            )
 
 
