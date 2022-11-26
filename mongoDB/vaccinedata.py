@@ -8,8 +8,7 @@ mycol = mydb["worldindata"]
 mycol2 = mydb["vaccination"]
 
 with open('[JSON]-[cleaned]-worldindata-covid.csv') as file1:
-
-        file_data1 = json.load(file1)
+    file_data1 = json.load(file1)
     
 # Inserting the loaded data in the Collection
 # if JSON contains data more than one entry
@@ -20,7 +19,6 @@ if isinstance(file_data1, list):
 
 # Loading or Opening the json file
 with open('[JSON]-[cleaned]-vaccination-data.csv') as file:
-   
     file_data = json.load(file)
     
 # Inserting the loaded data in the Collection
