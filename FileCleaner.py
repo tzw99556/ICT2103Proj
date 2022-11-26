@@ -44,7 +44,13 @@ class JsonManager:
             csvReader = csv.DictReader(csv_f) 
             #convert each csv row into python dict
             for row in csvReader: 
-                #add this python dict to json array
+                # converts values to floats if applicable
+                for key, value in row.items():
+                    try:
+                        temp = float(value)
+                        row[key] = temp
+                    except ValueError:
+                        continue
                 jsonArray.append(row)
     
         #convert python jsonArray to JSON String and write to file
