@@ -10,14 +10,14 @@
 
 
     <!-- Login Form -->
-    <form>
+    <form action=  "{{ url_for('login') }}" method="post">
       <h2>Login</h2>
-      <input type="text" id="login" class="fadeIn second" name="login" placeholder="Email">
-      <input type="text" id="password" class="fadeIn third" name="login" placeholder="Password">
+      <input type="text" id="username" class="fadeIn second" name="username" placeholder="Email">
+      <input type="password" id="password" class="fadeIn third" name="password" placeholder="Password">
       <input type="submit" value="Log In">
-
+     
     </form>
-
+    
     <!-- Remind Passowrd -->
  
 

@@ -1,12 +1,19 @@
+import os
 import sys
-from flask import Flask,render_template, url_for
+from flask import Flask,render_template, url_for,redirect, session
+from flask_session import Session
 from flask import request,jsonify
 from pymongo import MongoClient
 import mysql.connector
 import datetime
 
 
+SECRET_KEY = os.urandom(24)
 app = Flask(__name__)
+
+app.secret_key = SECRET_KEY 
+
+
 
 #mongodb
 client = MongoClient("mongodb://127.0.0.1:27017")
@@ -17,7 +24,7 @@ app = Flask('2103proj')
 #mariadb
 mydb = mysql.connector.connect(host="localhost",
                                    user="root",
-                                   password="Martinwee1",
+                                   password="0415",
                                    database="covid_sea_proj")
 
 
@@ -25,7 +32,7 @@ mydb = mysql.connector.connect(host="localhost",
 @app.route("/fifthpage")
 def fifthpage():
     mycursor = mydb.cursor()
-
+    
     # Number of ICU and Hospitalized patients out of all new cases
     mycursor.execute(
         "select c.country_name, d.date, h.hosp_patients, n.new_cases from country c, date d, cases_and_death n, hospital_admission h where c.country_id = n.country_id and c.country_id = h.country_id and d.date_id = h.date_id and d.date_id = n.date_id and d.date_id = h.date_id")
@@ -399,27 +406,32 @@ def secondpage():
    return render_template("secondpage.html" , casesanddeathpopulation =  casesanddeathpopulation, totalvaccine=totalvaccine,totaldeaths=totaldeaths, 
        vaccinatedSEA=vaccinatedSEA, confirmedcases=confirmedcases)
 
+
 #onload page
-@app.route("/")
+@app.route("/" , methods=['POST', 'GET'])
+def default():
+
+
+    return render_template('login.html')
+
+#handles login form request 
+@app.route("/login" , methods=['POST', 'GET'])
 def login():
-   
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+    #if form send request store form in username and password variable
+    if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM accounts WHERE username = % s AND password = % s', (username, password, ))
-        account = cursor.fetchone()
-        if account:
-            session['loggedin'] = True
-            session['id'] = account['id']
-            session['username'] = account['username']
-            msg = 'Logged in successfully !'
-            return render_template('index.html', msg = msg)
-        else:
-            msg = 'Incorrect username / password !'
-    return render_template('login.html', msg = msg)
-    # Connecting to mysql database
-    return render_template("login.html")
+        cursor = mydb.cursor()
+        cursor.execute('SELECT * FROM accounts where username=%s AND password =%s', (username, password))
+        record = cursor.fetchone()
+        #if record exists in database, direct to index page. 
+        if record:
+           
+            
+            return redirect(url_for('index'))
+
+    return render_template('login.html')
+
 
 
 #display index.html 
