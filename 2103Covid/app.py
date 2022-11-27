@@ -1,7 +1,6 @@
 import os
 import sys
 from flask import Flask,render_template, url_for,redirect, session, request
-from flask_session import Session
 from flask import request,jsonify
 from pymongo import MongoClient
 import mysql.connector
@@ -23,7 +22,7 @@ app = Flask('2103proj')
 #mariadb
 mydb = mysql.connector.connect(host="localhost",
                                    user="root",
-                                   password="0415",
+                                   password="Martinwee1",
                                    database="covid_sea_proj")
 
 
@@ -536,6 +535,7 @@ def index():
    
 
     username = request.args.get('username', None)
+    session['username'] = username;
     # Connecting to mysql database
     return render_template("index.html", values=values , labels=labels, labelstotaldeathandtotalcase=labelstotaldeathandtotalcase, totaldeaths=totaldeaths, 
        vaccinatedSEA=vaccinatedSEA, confirmedcases=confirmedcases, username = username
@@ -545,8 +545,8 @@ def index():
 def viewprofile():
 
     #username session
-    username = request.args.get('username', None)
-
+    # username = request.args.get('username', None)
+    username = session.get('username', None)
     return render_template("viewprofile.html", username = username)
     
 
@@ -569,6 +569,8 @@ def showData():
     # # return render_template('maria.html', values=data)
 
 if __name__ == '__main__':
+    app.secret_key = 'super secret key'
+    app.config['SESSION_TYPE'] = 'filesystem'
     app.config["TEMPLATES_AUTO_RELOAD"] = True
     app.run(host='0.0.0.0', port=5000, debug=True, threaded=True)
 
