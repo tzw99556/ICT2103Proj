@@ -3,6 +3,7 @@ import pandas as pd
 import json 
 import csv
 from datetime import datetime 
+import dateutil.parser as parser
 
 class FileCleaner:
     """Used to obtain a .csv file that contains only countries and columns of interest"""
@@ -46,6 +47,11 @@ class JsonManager:
             for row in csvReader: 
                 # converts values to floats if applicable
                 for key, value in row.items():
+                    if (key == "date"):
+                        original_date = row['date']
+                        new_date = parser.parse(original_date)
+                        new_date = new_date.isoformat()
+                        row[key] = new_date
                     try:
                         temp = float(value)
                         row[key] = temp

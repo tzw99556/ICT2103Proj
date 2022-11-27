@@ -15,7 +15,6 @@ class MariaDB_Manager:
         self.host = host # typically localhost unless hosted on cloud
         self.port = port # by default port 3306, use /status in mariadb cli to verify port id. 
         self.database = database # must already exists in maraidb client
-
         self.errorlog = []
         self.errorlog_txt = f"{self.database}-errorlog-{datetime.datetime.now()}.txt"
         self.allQueries = []
@@ -109,7 +108,6 @@ class MariaDB_Manager:
         print(f"Dropped {tables}, exiting")
         sys.exit(1)
 
-
 class Tuple_Generator:
     """Class helps to generate and format dataframes"""
     def __init__(self, source_file_name: str):
@@ -149,7 +147,7 @@ class TableBuilder_Worldindata:
         "CREATE TABLE IF NOT EXISTS Hospital_admission (hosp_patients INT UNSIGNED, weekly_hosp_admissions INT UNSIGNED, date_id INT UNSIGNED NOT NULL, country_id TINYINT UNSIGNED, PRIMARY KEY(date_id, country_id), FOREIGN KEY (date_id) REFERENCES Date(date_id), FOREIGN KEY (country_id) REFERENCES Country(country_id));",
         "CREATE TABLE IF NOT EXISTS Accounts (username VARCHAR(45), password VARCHAR(45));"]
         self.mariadb_connector.batch_query_executor(worldindata_create_table_queries)
-
+    
     def populate_a_new_table(self, worldindata_tuples):
         # (1) get df for table using worldindata_tuples.get_columns(["column_you_want"]) 
         # (2) convert df into a list of tuples using get_List_Of_Tuples("df")
@@ -205,7 +203,10 @@ class TableBuilder_Worldindata:
     def add_credentials(self, user, pwd):
         query = f"INSERT INTO Accounts VALUES ('{user}', '{pwd}');"
         self.mariadb_connector.single_query_executor(query)
-
+    
+    def create_index(self, index_name, table_name, column_name):
+        query = f"CREATE INDEX"
+        
 class TableBuilder_Vaccination:
     def __init__(self, mariadb_connector) -> None:
         self.mariadb_connector = mariadb_connector
@@ -272,6 +273,8 @@ def main():
     date_formatting_query = ["UPDATE Date SET date = STR_TO_DATE(date, '%d/%m/%Y');", "ALTER TABLE Date MODIFY COLUMN date date;"]
     mariadb_connector.batch_query_executor(date_formatting_query)
     mariadb_connector.generate_sql_file("db-maker.sql")
+
+
     
     
 if __name__ == "__main__":
