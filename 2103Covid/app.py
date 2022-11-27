@@ -407,8 +407,23 @@ def secondpage():
        vaccinatedSEA=vaccinatedSEA, confirmedcases=confirmedcases)
 
 
+#create account
+@app.route("/createaccount" , methods=['POST', 'GET'])
+def createaccount():
+        msg=''
+        if request.method == 'POST' and 'username' in request.form and 'password'  in request.form:
+              # Create variables for easy access
+            username = request.form['username']
+            password = request.form['password']
+            cursor = mydb.cursor()
+            cursor.execute('INSERT INTO accounts VALUES (%s, %s)', (username, password))
+            mydb.commit()            
+            msg = 'You have successfully registered!'
+        return render_template("createaccount.html", msg=msg)
+
+
 #onload page
-@app.route("/" , methods=['POST', 'GET'])
+@app.route("/")
 def default():
 
 
@@ -417,6 +432,7 @@ def default():
 #handles login form request 
 @app.route("/login" , methods=['POST', 'GET'])
 def login():
+ 
     #if form send request store form in username and password variable
     if request.method == 'POST':
         username = request.form['username']
@@ -426,9 +442,12 @@ def login():
         record = cursor.fetchone()
         #if record exists in database, direct to index page. 
         if record:
-           
             
+          
             return redirect(url_for('index'))
+
+
+          
 
     return render_template('login.html')
 
