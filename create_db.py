@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import mariadb
 import sys
 import pandas as pd
@@ -116,7 +117,7 @@ class Tuple_Generator:
         
     def get_columns(self, columns_of_interest: list) -> pd.DataFrame:
         df = self.df[columns_of_interest]
-        df = df.fillna(0) # Converts NaN values to 0 (Find a better number)
+        df = df.fillna(0) # Converts NaN values to 0
         return df[columns_of_interest]
         
     def get_List_Of_Tuples(self, a_df) -> list:
@@ -205,7 +206,9 @@ class TableBuilder_Worldindata:
         self.mariadb_connector.single_query_executor(query)
     
     def create_index(self, index_name, table_name, column_name):
-        query = f"CREATE INDEX {index_name}"
+        query = f"CREATE INDEX {index_name} ON {table_name}({column_name});"
+        print(query)
+        self.mariadb_connector.single_query_executor(query)
 
 class TableBuilder_Vaccination:
     def __init__(self, mariadb_connector) -> None:
@@ -236,11 +239,12 @@ def main():
         (4) Insert country_id and date_id into dataframe.
         (5) Populate the remaining tables
         (6) Also generates a .sql script that can be executed in sql client to create database without having to connect to mariadb client in python
-    **** Alternatively, run the maker.sql script in mariaDB, if cannot set up mariadb environement in python
+    * Alternatively, run the maker.sql script in mariaDB, if cannot set up mariadb environment in python
     """
     # (1) Creating mariaDB connection and creating Country, Date, Country_information, Cases_and_death and Hospital_admission tables
     mariadb_connector = MariaDB_Manager("yap", "123qwe", "localhost", 3306, "covid_sea_proj")
     # mariadb_connector.drop_all_tables() # for debugging
+
     # (2) Create tables
     worldindata_tables = TableBuilder_Worldindata(mariadb_connector)
     worldindata_tables.create_tables()
@@ -272,7 +276,16 @@ def main():
     # Convert date string to Date object
     date_formatting_query = ["UPDATE Date SET date = STR_TO_DATE(date, '%d/%m/%Y');", "ALTER TABLE Date MODIFY COLUMN date date;"]
     mariadb_connector.batch_query_executor(date_formatting_query)
+
+    # Creating indexes on tables
+    worldindata_tables.create_index("CountryID", "Country_information", "country_id")
+    worldindata_tables.create_index("CountryID", "Cases_and_death", "country_id")
+    worldindata_tables.create_index("dateID", "Date", "date_id")
+    
+    # Store all executed queries to db-maker.sql 
     mariadb_connector.generate_sql_file("db-maker.sql")
+
+
 if __name__ == "__main__":
     main()
 
