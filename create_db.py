@@ -205,8 +205,8 @@ class TableBuilder_Worldindata:
         self.mariadb_connector.single_query_executor(query)
     
     def create_index(self, index_name, table_name, column_name):
-        query = f"CREATE INDEX"
-        
+        query = f"CREATE INDEX {index_name}"
+
 class TableBuilder_Vaccination:
     def __init__(self, mariadb_connector) -> None:
         self.mariadb_connector = mariadb_connector
@@ -273,10 +273,6 @@ def main():
     date_formatting_query = ["UPDATE Date SET date = STR_TO_DATE(date, '%d/%m/%Y');", "ALTER TABLE Date MODIFY COLUMN date date;"]
     mariadb_connector.batch_query_executor(date_formatting_query)
     mariadb_connector.generate_sql_file("db-maker.sql")
-
-
-    
-    
 if __name__ == "__main__":
     main()
 
