@@ -1,17 +1,16 @@
 import os
 import sys
-from flask import Flask,render_template, url_for,redirect, session
+from flask import Flask,render_template, url_for,redirect, session, request
 from flask_session import Session
 from flask import request,jsonify
 from pymongo import MongoClient
 import mysql.connector
+from datetime import timedelta
 import datetime
 
 
-SECRET_KEY = os.urandom(24)
-app = Flask(__name__)
 
-app.secret_key = SECRET_KEY 
+app = Flask(__name__)
 
 
 
@@ -435,6 +434,7 @@ def login():
  
     #if form send request store form in username and password variable
     if request.method == 'POST':
+       
         username = request.form['username']
         password = request.form['password']
         cursor = mydb.cursor()
@@ -442,11 +442,11 @@ def login():
         record = cursor.fetchone()
         #if record exists in database, direct to index page. 
         if record:
-            
           
-            return redirect(url_for('index'))
+            #if account exists in database go to index.html
+          return redirect( url_for('index' , username=username))
 
-
+          
           
 
     return render_template('login.html')
@@ -533,17 +533,24 @@ def index():
     for row in result:
        values.append(row[i])
     print(values)
-    # return view of mariahtml , store values in to value variable and labels into labels variable so we can use it to call the 
-    # variables in the html page using {{values}}
    
+
+    username = request.args.get('username', None)
     # Connecting to mysql database
     return render_template("index.html", values=values , labels=labels, labelstotaldeathandtotalcase=labelstotaldeathandtotalcase, totaldeaths=totaldeaths, 
-       vaccinatedSEA=vaccinatedSEA, confirmedcases=confirmedcases
+       vaccinatedSEA=vaccinatedSEA, confirmedcases=confirmedcases, username = username
    
     )
+@app.route('/viewprofile')
+def viewprofile():
 
+    #username session
+    username = request.args.get('username', None)
 
+    return render_template("viewprofile.html", username = username)
     
+
+
 #mongo db 
 @app.route('/showData')
 def showData():
