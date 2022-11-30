@@ -49,7 +49,7 @@ class JsonManager:
                 for key, value in row.items():
                     if (key == "date"):
                         original_date = row['date']
-                        new_date = parser.parse(original_date)
+                        new_date = parser.parse(original_date, dayfirst=True)
                         new_date = new_date.isoformat()
                         row[key] = new_date
                     try:
