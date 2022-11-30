@@ -429,8 +429,11 @@ def createaccount():
               # Create variables for easy access
             username = request.form['username']
             password = request.form['password']
+            pw_hash = bcrypt.generate_password_hash(password)
+            
             cursor = mydb.cursor()
-            cursor.execute('INSERT INTO accounts VALUES (%s, %s)', (username, password))
+
+            cursor.execute('INSERT INTO accounts VALUES (%s, %s)', (username, pw_hash))
             mydb.commit()            
             msg = 'You have successfully registered!'
             return redirect("login")
@@ -443,9 +446,10 @@ def updatepassword():
         if request.method == 'POST' and 'newpassword' in request.form:
             username = session.get('username', None)
             password = request.form['newpassword']
+            hashpass = bcrypt.generate_password_hash(password)
             print(password)
             cursor = mydb.cursor()
-            cursor.execute('UPDATE accounts set password = %s where username = %s', (password, username))
+            cursor.execute('UPDATE accounts set password = %s where username = %s', (hashpass, username))
             mydb.commit()
             msg = 'You have successfully updated password!'
             return redirect("login")
@@ -482,12 +486,17 @@ def login():
 
         username = request.form['username']
         password = request.form['password']
-        cursor = mydb.cursor()
-        cursor.execute('SELECT * FROM accounts where username=%s AND password =%s', (username, password))
-        record = cursor.fetchone()
+        # cursor = mydb.cursor()
+        cursor1 = mydb.cursor()
+        
+        # cursor.execute('SELECT * FROM accounts where username=%s AND password =%s', (username, password))
+        cursor1.execute('SELECT password FROM accounts where username="'+username+'"')
+        record1 = cursor1.fetchone()
+        
+        # record = cursor.fetchone()
         
         #if record exists in database, direct to index page. 
-        if record: 
+        if record1 and bcrypt.check_password_hash(record1[0],password): 
 
             #if account exists in database go to index.html
           return redirect( url_for('index' , username=username))
