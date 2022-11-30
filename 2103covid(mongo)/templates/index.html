@@ -44,25 +44,27 @@
             </div>
             <div class="well">
               <h3> Total confirmed cases</h3><br>
-              
-              <span class="count" style="color:rgb(154, 33, 33); font-size: x-large;"></span><br><br>
+        
+              <span class="count" style="color:rgb(154, 33, 33); font-size: x-large;">{% for x in totalconfirmedcase %}
+                {{x['TotalCase']}}
+                {% endfor %}</span><br><br>
   
           </div>
               </div>
               
           <div class="col-sm-9" >
             <div class="well"style="width: 900px;">
-              <h2>Total confirmed cases to date for each country</h2><a href>View Profile</a>
+              <h2>Total confirmed cases to date for SEA country</h2><a href>View Profile</a>
       <div class="container" style="width:800px;">
       
         <canvas id="myChart" width="500" height="200"></canvas>
-        <h2>Total deaths to Total cases for each country</h2>
+        <h2>Total number of people vaccinated in each country to date</h2>
         <canvas id="chart" width="500" height="200"></canvas>
         
   <div class="pagination">
     
     <a href>1</a>
-    <a href>2</a>
+    <a href= "{{ url_for('secondpage')}}">2</a>
     <a href>3</a>
     <a href>4</a>
     <a href="#">5</a>
@@ -87,10 +89,53 @@
           
   
       <script>
-  
-  
-  
-  
+//this chart is total confirmed cases to date
+new Chart("myChart", {
+      type: "bar",
+      data: {
+        labels:  [{% for item in totalcaseslist %}
+    "{{item}}",
+    {% endfor %}],
+
+        datasets: [{
+          label: 'total covid cases',
+          backgroundColor:"rgba(206, 70, 90, 1)",
+             fillColor: "rgba(206, 70, 90, 1)",
+             strokeColor: "rgba(220,220,220,0.8)",
+              pointColor: "rgba(220,220,220,1)",
+          fill: false,
+          data: [{% for item in totalcasesnumber %}
+    "{{item}}",
+    {% endfor %}]
+        }]
+      }      
+});
+
+
+
+
+//this chart is total cases to total deaths in the country
+new Chart("chart", {
+      type: "horizontalBar",
+      data: {
+        labels:  [{% for item in countryname %}
+    "{{item}}",
+    {% endfor %}],
+
+        datasets: [{
+          label: 'total vaccinated',
+          backgroundColor:"rgba(206, 70, 90, 1)",
+             fillColor: "rgba(55, 202, 21)",
+             strokeColor: "rgba(220,220,220,0.8)",
+              pointColor: "rgba(220,220,220,1)",
+          fill: false,
+          data: [{% for item in countrypeoplevaccinated %}
+    "{{item}}",
+    {% endfor %}]
+        }]
+      }      
+});
+
   
   
   

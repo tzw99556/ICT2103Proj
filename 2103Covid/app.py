@@ -63,9 +63,6 @@ def fifthpage():
     ThailandWeeklyVal = {}
     LaosWeeklyVal = {}
     IndonesiaWeeklyVal = {}
-    day = 0
-    month = 0
-    year = 0
     for row in result:
         day = row[1].day
         month = row[1].month
@@ -419,6 +416,33 @@ def createaccount():
             msg = 'You have successfully registered!'
         return render_template("createaccount.html", msg=msg)
 
+#update account password
+@app.route("/updatepassword" , methods=['POST', 'GET'])
+def updatepassword():
+        msg=''
+        if request.method == 'POST' and 'newpassword' in request.form:
+            username = session.get('username', None)
+            password = request.form['newpassword']
+            print(password)
+            cursor = mydb.cursor()
+            cursor.execute('UPDATE accounts set password = %s where username = %s', (password, username))
+            mydb.commit()
+            msg = 'You have successfully updated password!'
+        return render_template("updatepassword.html", msg=msg)
+
+#delete account
+@app.route("/deleteaccount" , methods=['POST', 'GET'])
+def deleteaccount():
+        msg=''
+        if request.method == 'POST' and session.get('username'):
+            username = session.get('username', None)
+            print(username)
+            cursor = mydb.cursor()
+            cursor.execute('DELETE FROM accounts where username = "'+username+'"')
+            mydb.commit()
+            msg = 'You have successfully deleted account!'
+        return render_template("deleteaccount.html", msg=msg)
+
 
 #onload page
 @app.route("/")
@@ -433,7 +457,7 @@ def login():
  
     #if form send request store form in username and password variable
     if request.method == 'POST':
-       
+
         username = request.form['username']
         password = request.form['password']
         cursor = mydb.cursor()
@@ -441,11 +465,11 @@ def login():
         record = cursor.fetchone()
         #if record exists in database, direct to index page. 
         if record:
-          
+
             #if account exists in database go to index.html
           return redirect( url_for('index' , username=username))
 
-          
+
           
 
     return render_template('login.html')
