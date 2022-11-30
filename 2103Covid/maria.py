@@ -3,14 +3,16 @@ import sys
 from flask import Flask,render_template, url_for,redirect, session, request
 from flask import request,jsonify
 from pymongo import MongoClient
+from flask_bcrypt import Bcrypt
 import mysql.connector
 from datetime import timedelta
 import datetime
 
 
 
-app = Flask(__name__)
 
+app = Flask(__name__)
+bcrypt = Bcrypt(app)
 
 
 #mongodb
@@ -22,7 +24,7 @@ app = Flask('2103proj')
 #mariadb
 mydb = mysql.connector.connect(host="localhost",
                                    user="root",
-                                   password="Martinwee1",
+                                   password="0415",
                                    database="covid_sea_proj")
 
 
@@ -30,11 +32,19 @@ mydb = mysql.connector.connect(host="localhost",
 @app.route("/fifthpage")
 def fifthpage():
     mycursor = mydb.cursor()
+    mycursor2 = mydb.cursor()
     
     # Number of ICU and Hospitalized patients out of all new cases
     mycursor.execute(
         "select c.country_name, d.date, h.hosp_patients, n.new_cases from country c, date d, cases_and_death n, hospital_admission h where c.country_id = n.country_id and c.country_id = h.country_id and d.date_id = h.date_id and d.date_id = n.date_id and d.date_id = h.date_id")
     result = mycursor.fetchall()
+
+    mycursor2.execute("SELECT SUM(c.total_deaths) FROM cases_and_death c, date d WHERE c.date_id = d.date_id and d.date IN (SELECT max(date) FROM date)")
+    result2 = mycursor2.fetchall()
+
+    totaldeaths = []
+    for row4 in result2:
+            totaldeaths.append(str(row4[0]))
 
     # Covid-19 Cases for each SEA country to date
     ICUDates = list()
@@ -163,7 +173,7 @@ def fifthpage():
                            CambodiaWeeklyVal=CambodiaWeeklyVal, PhilippinesWeeklyVal=PhilippinesWeeklyVal,
                            VietnamWeeklyVal=VietnamWeeklyVal, TimorWeeklyVal=TimorWeeklyVal,
                            ThailandWeeklyVal=ThailandWeeklyVal, LaosWeeklyVal=LaosWeeklyVal,
-                           IndonesiaWeeklyVal=IndonesiaWeeklyVal
+                           IndonesiaWeeklyVal=IndonesiaWeeklyVal, totaldeaths = totaldeaths
                            )
 
 
@@ -174,6 +184,7 @@ def fourthpage():
 
     mycursor = mydb.cursor()
     mycursor2 = mydb.cursor()
+    mycursor3 = mydb.cursor()
     # mycursor3 = mydb.cursor()
     # mycursor4 = mydb.cursor()
 
@@ -186,6 +197,14 @@ def fourthpage():
     mycursor2.execute(
         "SELECT t.country_name, c.new_deaths, d.date FROM cases_and_death c ,date d, country t WHERE t.country_id = c.country_id and c.date_id = d.date_id")
     result2 = mycursor2.fetchall()
+
+    mycursor3.execute("SELECT SUM(c.total_deaths) FROM cases_and_death c, date d WHERE c.date_id = d.date_id and d.date IN (SELECT max(date) FROM date)")
+    result3 = mycursor3.fetchall()
+        #total deaths to date label
+    totaldeaths = []
+    for row4 in result3:
+            totaldeaths.append(str(row4[0]))
+
 
     # Covid-19 Cases for each SEA country to date
     Coviddates = list()
@@ -282,7 +301,7 @@ def fourthpage():
                            CambodiaDeaths=CambodiaDeaths, PhillipinesDeaths=PhillipinesDeaths,
                            VietnamDeaths=VietnamDeaths,TimorDeaths=TimorDeaths,
                            ThailandDeaths=ThailandDeaths, LaosDeaths=LaosDeaths,
-                           IndonesiaDeaths=IndonesiaDeaths, SEADeaths=SEADeaths
+                           IndonesiaDeaths=IndonesiaDeaths, SEADeaths=SEADeaths,totaldeaths=totaldeaths
                            )
 
 
@@ -410,11 +429,15 @@ def createaccount():
               # Create variables for easy access
             username = request.form['username']
             password = request.form['password']
+            pw_hash = bcrypt.generate_password_hash(password)
+            
             cursor = mydb.cursor()
-            cursor.execute('INSERT INTO accounts VALUES (%s, %s)', (username, password))
+
+            cursor.execute('INSERT INTO accounts VALUES (%s, %s)', (username, pw_hash))
             mydb.commit()            
             msg = 'You have successfully registered!'
-        return render_template("createaccount.html", msg=msg)
+            return redirect("login")
+        return render_template("createaccount.html", msg=msg , )
 
 #update account password
 @app.route("/updatepassword" , methods=['POST', 'GET'])
@@ -423,11 +446,13 @@ def updatepassword():
         if request.method == 'POST' and 'newpassword' in request.form:
             username = session.get('username', None)
             password = request.form['newpassword']
+            hashpass = bcrypt.generate_password_hash(password)
             print(password)
             cursor = mydb.cursor()
-            cursor.execute('UPDATE accounts set password = %s where username = %s', (password, username))
+            cursor.execute('UPDATE accounts set password = %s where username = %s', (hashpass, username))
             mydb.commit()
             msg = 'You have successfully updated password!'
+            return redirect("login")
         return render_template("updatepassword.html", msg=msg)
 
 #delete account
@@ -441,6 +466,7 @@ def deleteaccount():
             cursor.execute('DELETE FROM accounts where username = "'+username+'"')
             mydb.commit()
             msg = 'You have successfully deleted account!'
+            return redirect("login")
         return render_template("deleteaccount.html", msg=msg)
 
 
@@ -454,25 +480,31 @@ def default():
 #handles login form request 
 @app.route("/login" , methods=['POST', 'GET'])
 def login():
- 
+    msg =''
     #if form send request store form in username and password variable
     if request.method == 'POST':
 
         username = request.form['username']
         password = request.form['password']
-        cursor = mydb.cursor()
-        cursor.execute('SELECT * FROM accounts where username=%s AND password =%s', (username, password))
-        record = cursor.fetchone()
+        # cursor = mydb.cursor()
+        cursor1 = mydb.cursor()
+        
+        # cursor.execute('SELECT * FROM accounts where username=%s AND password =%s', (username, password))
+        cursor1.execute('SELECT password FROM accounts where username="'+username+'"')
+        record1 = cursor1.fetchone()
+        
+        # record = cursor.fetchone()
+        
         #if record exists in database, direct to index page. 
-        if record:
+        if record1 and bcrypt.check_password_hash(record1[0],password): 
 
             #if account exists in database go to index.html
           return redirect( url_for('index' , username=username))
-
-
+        else:
+         msg = 'incorrect password/username'
           
 
-    return render_template('login.html')
+    return render_template('login.html', msg=msg)
 
 
 
