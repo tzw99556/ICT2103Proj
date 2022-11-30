@@ -14,7 +14,7 @@ Workflow:
 (2) Run FileCleaner.py to extract, filter and clean datasets
     >> [cleaned]-vaccination-data.csv and [cleaned]-worldindata-covid.csv files will be genereated
         these files will be used for RDBMS.
-    >> [JSON]-[cleaned]-vaccination-data.csv and m[JSON]-[cleaned]-worldindata-data.csv will be generated these files will be used mongoDB.
+    >> [JSON]-[cleaned]-vaccination-data.csv and [JSON]-[cleaned]-worldindata-data.csv will be generated these files will be used mongoDB.
 (3) Enter mariadb console and create 'covid_sea_pro' database, Run create_db.py [Ensure credentials have been changed]
     >> mariadb database will be created. 
     >> db-maker.sql will also be created. db-maker.sql logs all the queries executed in create_db.py.
